@@ -10,15 +10,15 @@ GROUP MEMBERS AND MODULE OWNERSHIP
 ----------------------------------
   Nathan  - Core application, CMake, GLFW/OpenGL/ImGui setup, main loop,
             shutdown, desktop wallpaper, shared state (AppState)
-            Files: src/main.cpp, src/core/Application.cpp,
-                   include/core/Application.h, include/core/AppState.h,
-                   src/ui/Desktop.cpp, include/ui/Desktop.h, CMakeLists.txt
+            Files: src/main.cc, src/core/application.cc,
+                   include/core/application.h, include/core/app_state.h,
+                   src/ui/desktop.cc, include/ui/desktop.h, CMakeLists.txt
   Kim     - Taskbar, File Explorer, System Settings
-            Files: src/ui/Taskbar.*, src/apps/FileExplorer.*, src/apps/Settings.*
+            Files: src/ui/taskbar.*, src/apps/file_explorer.*, src/apps/settings.*
   Byron   - Task Manager and dummy process data
-            Files: src/apps/TaskManager.*
+            Files: src/apps/task_manager.*
   Lorens  - Theme, reusable widgets, real-time clock, PWR button
-            Files: src/ui/Theme.*, src/ui/Widgets.*, src/ui/SystemControls.*
+            Files: src/ui/theme.*, src/ui/widgets.*, src/ui/system_controls.*
   (.h files live under include/ with the same sub-folder.)
 
 Current status per module: see SESSION_HANDOFF.md (top section).
@@ -80,10 +80,28 @@ Build output goes to out\build\<preset>\ (ignored by git).
 
 ADDING A NEW SOURCE FILE
 ------------------------
-Put .cpp files anywhere under src\ and headers under include\. CMake collects
-src\**\*.cpp automatically. In Visual Studio use
-Project > Configure Cache (or save CMakeLists.txt) so the new file is seen.
-Include headers by path from include\, e.g.  #include "apps/TaskManager.h".
+Put .cc files anywhere under src\ and headers (.h) under include\. CMake
+collects src\**\*.cc automatically (a .cpp file would be IGNORED). In Visual
+Studio use Project > Configure Cache (or save CMakeLists.txt) so the new file
+is seen. Include headers by path from include\, e.g.
+  #include "apps/task_manager.h"
+
+CODING STYLE
+------------
+All C++ follows the Google C++ Style Guide:
+  https://google.github.io/styleguide/cppguide.html
+The .clang-format file in the project root makes Visual Studio format code
+in Google style: Edit > Advanced > Format Document (Ctrl+K, Ctrl+D).
+Naming summary (details and examples in docs\ARCHITECTURE.md "Coding style"):
+  files          lower_snake_case.cc / .h      task_manager.cc
+  header guard   DESKTOP_OS_<PATH>_<FILE>_H_   DESKTOP_OS_APPS_TASK_MANAGER_H_
+  namespaces     desktop_os::<module>          desktop_os::task_manager
+  types          PascalCase                    AppState
+  functions      PascalCase                    Render(), DrawGlow()
+  variables      snake_case                    show_task_manager
+  class members  snake_case_ (trailing _)      window_
+  constants      kPascalCase                   kTaskbarHeight
+  indentation    2 spaces, max 80 columns
 
 TROUBLESHOOTING
 ---------------
@@ -97,8 +115,9 @@ TROUBLESHOOTING
       The configure step failed or never ran; check the Output > CMake pane,
       then Project > Delete Cache and Reconfigure.
   LNK2019 unresolved external symbol "SomeModule::Render"
-      A Render call was added to Application.cpp but that module's .cpp
-      does not exist yet or was not picked up. Reconfigure CMake.
+      A Render call was added to application.cc but that module's .cc
+      does not exist yet or was not picked up (check it ends in .cc, not
+      .cpp). Reconfigure CMake.
   LNK2005 "already defined" for an ImGui symbol
       Somebody added imgui .cpp files to src\. Delete them; ImGui is built
       only by the "imgui" target in CMakeLists.txt.
@@ -113,11 +132,11 @@ PROJECT DIRECTORY OVERVIEW
 --------------------------
   CMakeLists.txt        build definition, pinned dependencies
   CMakePresets.json     x64-debug / x64-release configurations
-  src\main.cpp          ENTRY POINT: creates Application, init(), run()
+  src\main.cc          ENTRY POINT: creates Application, Init(), Run()
   src\core\             Application: window, OpenGL, ImGui, loop, shutdown
   src\ui\               desktop, taskbar, theme, widgets, clock/PWR
   src\apps\             File Explorer, Settings, Task Manager
-  include\              headers mirroring src\ (AppState.h = shared state)
+  include\              headers mirroring src\ (app_state.h = shared state)
   docs\ARCHITECTURE.md  design, lifecycle, shared interfaces
   PROJECT_PLAN.md       roadmap, ownership, milestones
   SESSION_HANDOFF.md    current status + session log (READ THIS FIRST)
@@ -125,13 +144,9 @@ PROJECT DIRECTORY OVERVIEW
 
 GIT / GITHUB
 ------------
-The folder is not yet a git repository (as of 2026-10-09). To set it up:
-  git init -b main
-  git add .
-  git commit -m "core: project skeleton, graphics init, desktop"
-  (create an empty repo on GitHub, then)
-  git remote add origin https://github.com/<user>/<repo>.git
-  git push -u origin main
+Repository: https://github.com/NathanLaborada/CSOPESY-MCO4
+  git clone https://github.com/NathanLaborada/CSOPESY-MCO4.git
+If the development branch does not exist yet, Nathan creates it once:
   git switch -c development && git push -u origin development
 
 Branches: main (stable, demo-ready), development (integration), and one
@@ -146,7 +161,7 @@ Workflow:
   4. Push, open a Pull Request into development, and ask one other
      member to review it (does it build? does the app still start/exit?).
   5. After merging, everyone pulls development, rebuilds, and re-tests.
-  Do not edit another member's files. Changes to AppState.h or
-  Application.cpp go through Nathan. Agree them in chat first.
+  Do not edit another member's files. Changes to app_state.h or
+  application.cc go through Nathan. Agree them in chat first.
   On merge conflicts: keep both sides' intent, rebuild, run the app, and
   ask the file's owner if unsure.

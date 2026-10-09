@@ -28,13 +28,13 @@ This is a desktop-style operating system mockup written in C++17 with OpenGL, GL
 | V1 | Consistent dark theme, hover/active states, usable when resized | Lorens (theme) / all | Resizing of desktop DONE; theme TODO |
 
 **Optional enhancements** (only after all of the above):
-- Wallpaper picker in Settings (`wallpaperIndex` already supported by Desktop).
-- Theme switcher (`themeIndex`).
+- Wallpaper picker in Settings (`wallpaper_index` already supported by Desktop).
+- Theme switcher (`theme_index`).
 - Task Manager sorting.
 
 ## 3. Architecture
 
-See `docs/ARCHITECTURE.md` for the full description. In short: `main.cpp` → `Application` (owns GLFW/OpenGL/ImGui and the loop) → a single `AppState` passed by reference to each module's `Render(AppState&)` function every frame.
+See `docs/ARCHITECTURE.md` for the full description. In short: `main.cc` → `Application` (owns GLFW/OpenGL/ImGui and the loop) → a single `AppState` passed by reference to each module's `Render(AppState&)` function every frame.
 
 ## 4. Folder structure (actual)
 
@@ -45,15 +45,15 @@ MCO4/
 ├── .gitignore
 ├── README.txt  PROJECT_PLAN.md  PPT_README.md  SESSION_HANDOFF.md
 ├── docs/ARCHITECTURE.md
-├── include/core/{Application.h, AppState.h}
-├── include/ui/Desktop.h
-├── src/main.cpp
-├── src/core/Application.cpp
-└── src/ui/Desktop.cpp
+├── include/core/{application.h, app_state.h}
+├── include/ui/desktop.h
+├── src/main.cc
+├── src/core/application.cc
+└── src/ui/desktop.cc
 ```
 
-Files to be added by members (CMake picks up new `src/**/*.cpp` automatically):
-`include/ui/{Taskbar,Theme,Widgets,SystemControls}.h`, `include/apps/{FileExplorer,Settings,TaskManager}.h`, and the matching `.cpp` files in `src/ui/` and `src/apps/`.
+Files to be added by members (CMake picks up new `src/**/*.cc` automatically):
+`include/ui/{taskbar,theme,widgets,system_controls}.h`, `include/apps/{file_explorer,settings,task_manager}.h`, and the matching `.cc` files in `src/ui/` and `src/apps/`.
 
 ## 5. Member responsibilities
 
@@ -64,27 +64,27 @@ Files to be added by members (CMake picks up new `src/**/*.cpp` automatically):
 - Init error handling with partial cleanup; ordered shutdown: **DONE**
 - Desktop wallpaper (3 styles) and watermark: **DONE**
 - Shared `AppState` interface and module contract: **DONE**
-- Integration of other members' `Render` calls into `Application::renderFrame`: **TODO**, as each module lands
+- Integration of other members' `Render` calls into `Application::RenderFrame`: **TODO**, as each module lands
 
 ### Kim: taskbar and app screens
-- `Taskbar`: fixed bottom bar, exactly `kTaskbarHeight` tall, full width, ≥3 icon buttons that set `showFileExplorer` / `showSettings` / `showTaskManager` to true. Show an "open" indicator under each button whose app is visible.
+- `Taskbar`: fixed bottom bar, exactly `kTaskbarHeight` tall, full width, ≥3 icon buttons that set `show_file_explorer` / `show_settings` / `show_task_manager` to true. Show an "open" indicator under each button whose app is visible.
 - `FileExplorer`: sidebar (Quick access, This PC…), breadcrumb/path bar, placeholder file/folder table with drawn icons, click-to-select, double-click a folder to navigate.
-- `Settings`: left category list (System, Display, Personalization, About), placeholder system info marked "simulated", wallpaper combo using `Desktop::kWallpaperNames`, theme selector writing `themeIndex`.
+- `Settings`: left category list (System, Display, Personalization, About), placeholder system info marked "simulated", wallpaper combo using `desktop::kWallpaperNames`, theme selector writing `theme_index`.
 
 ### Byron: Task Manager
 - `TaskManager`: Windows-style window with a "Processes" tab/header, an `ImGui::BeginTable` with Name / Status / CPU % / Memory (MB) columns.
-- Dummy data in a separate `struct Process` array (header or top of `.cpp`) so it's easy to edit. Values are deterministic, e.g. a fixed base value plus a small sine-based fluctuation over `ImGui::GetTime()`.
+- Dummy data in a separate `struct Process` array (header or top of `.cc`) so it's easy to edit. Values are deterministic, e.g. a fixed base value plus a small sine-based fluctuation over `ImGui::GetTime()`.
 - Totals row/header (overall CPU % and memory); optional column sorting.
 
 ### Lorens: shared UI framework, clock, PWR
-- `Theme`: `Apply(int themeIndex)` sets ImGui colors, rounding and spacing. Nathan swaps it in for `ImGui::StyleColorsDark()` in `Application::init()`. Re-apply when `themeIndex` changes.
+- `Theme`: `Apply(int theme_index)` sets ImGui colors, rounding and spacing. Nathan swaps it in for `ImGui::StyleColorsDark()` in `Application::Init()`. Re-apply when `theme_index` changes.
 - `Widgets`: `IconButton(...)` with drawn icons (folder, gear, chart, power), hover/active states, and a panel/label helper.
-- `SystemControls::Render(AppState&)`: real-time clock (`std::chrono` + `localtime_s`, HH:MM:SS and date) and the PWR button (power icon, red hover) that sets `state.shutdownRequested = true`. Place both in the taskbar's right end (coordinate positions with Kim).
+- `system_controls::Render(AppState&)`: real-time clock (`std::chrono` + `localtime_s`, HH:MM:SS and date) and the PWR button (power icon, red hover) that sets `state.shutdown_requested = true`. Place both in the taskbar's right end (coordinate positions with Kim).
 - Cross-module visual consistency and resize checks.
 
 ## 6. Shared interfaces
 
-Defined in `include/core/AppState.h`. Documented in `docs/ARCHITECTURE.md` (sections "Shared state" and "Module contract"). Every module's public interface is one function, `void <Module>::Render(AppState& state)`.
+Defined in `include/core/app_state.h`. Documented in `docs/ARCHITECTURE.md` (sections "Shared state" and "Module contract"). Every module's public interface is one function, `void <module>::Render(AppState& state)`.
 
 ## 7. UI design
 
@@ -105,13 +105,13 @@ Defined in `include/core/AppState.h`. Documented in `docs/ARCHITECTURE.md` (sect
 | M6 Integration | All `Render` calls wired; full test checklist | TODO |
 | M7 Docs + PPT | Final README/handoff/PPT guide refresh, screenshots | TODO |
 
-M3–M5 can run in parallel; each depends only on M1/M2. Kim's taskbar buttons should use Lorens's `Widgets::IconButton` once it exists. Until then a plain `ImGui::Button` is fine and can be swapped later.
+M3–M5 can run in parallel; each depends only on M1/M2. Kim's taskbar buttons should use Lorens's `widgets::IconButton` once it exists. Until then a plain `ImGui::Button` is fine and can be swapped later.
 
 ## 9. Integration strategy
 
 1. Each member works on their own branch and their own files only.
 2. When a module compiles and works on its own (temporarily calling it locally is fine), open a PR to `development`.
-3. Nathan adds the single `<Module>::Render(state_);` line in `Application::renderFrame()` (the comment block lists the order) during review.
+3. Nathan adds the single `<module>::Render(state_);` line in `Application::RenderFrame()` (the comment block lists the order) during review.
 4. After each merge, everyone pulls `development`, rebuilds, and runs the test checklist below.
 5. `development` → `main` only when the full checklist passes.
 
@@ -123,7 +123,7 @@ Use the checklist in `SESSION_HANDOFF.md` ("Test checklist"). Mark each test PAS
 
 | Risk | Mitigation |
 |---|---|
-| Members edit `Application.cpp` or `AppState.h` simultaneously → merge conflicts | Only Nathan edits them; changes are requested in chat first |
+| Members edit `application.cc` or `app_state.h` simultaneously → merge conflicts | Only Nathan edits them; changes are requested in chat first |
 | FetchContent needs internet + git on first configure | Documented in README; after the first configure, the deps are cached in `out/` |
 | GPU driver ignores vsync → 100% CPU | Loop uses `glfwWaitEventsTimeout` (verified ~0–5% CPU idle) |
 | Apps overlap taskbar | `kTaskbarHeight` constant; apps clamp position/size above it |

@@ -40,9 +40,10 @@ target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/
 target_link_libraries(imgui PUBLIC glfw OpenGL::GL)
 
 # --- Application -----------------------------------------------------------
-# Every .cpp under src/ is picked up automatically, so members add their module
+# Every .cc under src/ is picked up automatically, so members add their module
 # files without editing this file (re-run CMake configure after adding a file).
-file(GLOB_RECURSE DESKTOPOS_SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cpp)
+# Naming follows the Google C++ Style Guide: lower_snake_case.cc / .h.
+file(GLOB_RECURSE DESKTOPOS_SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cc)
 
 add_executable(DesktopOS ${DESKTOPOS_SOURCES})
 target_include_directories(DesktopOS PRIVATE ${CMAKE_SOURCE_DIR}/include)
