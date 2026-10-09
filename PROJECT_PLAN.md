@@ -1,0 +1,137 @@
+# PROJECT_PLAN — CSOPESY MO4 Desktop-Style OS Mockup
+
+Last updated: 2026-10-09 (Nathan's core session).
+Status legend: **DONE** (implemented and verified) · **TODO** (not started) · **IN PROGRESS**.
+
+## 1. Overview
+
+This is a desktop-style operating system mockup written in C++17 with OpenGL, GLFW and Dear ImGui, built with CMake through Visual Studio Community 2026. It is a graphical simulation only, not a real OS or kernel. All process and system data shown is dummy data.
+
+## 2. Assignment requirements
+
+> **Note:** the assignment PDF (`MO4 - Desktop_GUI.pdf`) was **not in the workspace** during the first session. The requirements below come from the group's prompt (`ClaudePrompt-Nathan.md`). Whoever has the PDF should check this list against it and add anything missing.
+
+| # | Requirement | Owner | Status |
+|---|---|---|---|
+| A1 | Desktop background fills the client area | Nathan | DONE |
+| A2 | Wallpaper (gradient / drawn pattern) | Nathan | DONE (3 wallpapers) |
+| A3 | Real-time clock showing system time | Lorens | TODO |
+| A4 | Clearly identifiable PWR button that closes the app gracefully | Lorens (button) / Nathan (shutdown path) | Shutdown path DONE, button TODO |
+| A5 | Resources cleaned up on shutdown | Nathan | DONE |
+| B1 | Fixed taskbar, top or bottom | Kim | TODO |
+| B2 | ≥3 working icon buttons: File Explorer, System Settings, Task Manager | Kim | TODO |
+| B3 | Taskbar remains visible while apps are open | Kim | TODO |
+| C1 | Task Manager with Processes section and table | Byron | TODO |
+| C2 | Process name, CPU %, memory columns with dummy data | Byron | TODO |
+| D1 | File Explorer: title/nav area, placeholder listing, content area, icons, selection | Kim | TODO |
+| E1 | System Settings: title/nav, categories, placeholder info, demo controls | Kim | TODO |
+| V1 | Consistent dark theme, hover/active states, usable when resized | Lorens (theme) / all | Resizing of desktop DONE; theme TODO |
+
+**Optional enhancements** (only after all of the above):
+- Wallpaper picker in Settings (`wallpaperIndex` already supported by Desktop).
+- Theme switcher (`themeIndex`).
+- Task Manager sorting.
+
+## 3. Architecture
+
+See `docs/ARCHITECTURE.md` for the full description. In short: `main.cpp` → `Application` (owns GLFW/OpenGL/ImGui and the loop) → a single `AppState` passed by reference to each module's `Render(AppState&)` function every frame.
+
+## 4. Folder structure (actual)
+
+```text
+MCO4/
+├── CMakeLists.txt          build + pinned deps (GLFW 3.4, ImGui v1.91.9b)
+├── CMakePresets.json       x64-debug / x64-release (Ninja + MSVC)
+├── .gitignore
+├── README.txt  PROJECT_PLAN.md  PPT_README.md  SESSION_HANDOFF.md
+├── docs/ARCHITECTURE.md
+├── include/core/{Application.h, AppState.h}
+├── include/ui/Desktop.h
+├── src/main.cpp
+├── src/core/Application.cpp
+└── src/ui/Desktop.cpp
+```
+
+Files to be added by members (CMake picks up new `src/**/*.cpp` automatically):
+`include/ui/{Taskbar,Theme,Widgets,SystemControls}.h`, `include/apps/{FileExplorer,Settings,TaskManager}.h`, and the matching `.cpp` files in `src/ui/` and `src/apps/`.
+
+## 5. Member responsibilities
+
+### Nathan: core, graphics setup, desktop (DONE for this phase)
+- CMake configuration with pinned FetchContent dependencies and presets: **DONE**
+- GLFW init, OpenGL 3.3 core context, Dear ImGui + GLFW/OpenGL3 backends: **DONE**
+- Main loop, idle throttling, resize-safe viewport: **DONE**
+- Init error handling with partial cleanup; ordered shutdown: **DONE**
+- Desktop wallpaper (3 styles) and watermark: **DONE**
+- Shared `AppState` interface and module contract: **DONE**
+- Integration of other members' `Render` calls into `Application::renderFrame`: **TODO**, as each module lands
+
+### Kim: taskbar and app screens
+- `Taskbar`: fixed bottom bar, exactly `kTaskbarHeight` tall, full width, ≥3 icon buttons that set `showFileExplorer` / `showSettings` / `showTaskManager` to true. Show an "open" indicator under each button whose app is visible.
+- `FileExplorer`: sidebar (Quick access, This PC…), breadcrumb/path bar, placeholder file/folder table with drawn icons, click-to-select, double-click a folder to navigate.
+- `Settings`: left category list (System, Display, Personalization, About), placeholder system info marked "simulated", wallpaper combo using `Desktop::kWallpaperNames`, theme selector writing `themeIndex`.
+
+### Byron: Task Manager
+- `TaskManager`: Windows-style window with a "Processes" tab/header, an `ImGui::BeginTable` with Name / Status / CPU % / Memory (MB) columns.
+- Dummy data in a separate `struct Process` array (header or top of `.cpp`) so it's easy to edit. Values are deterministic, e.g. a fixed base value plus a small sine-based fluctuation over `ImGui::GetTime()`.
+- Totals row/header (overall CPU % and memory); optional column sorting.
+
+### Lorens: shared UI framework, clock, PWR
+- `Theme`: `Apply(int themeIndex)` sets ImGui colors, rounding and spacing. Nathan swaps it in for `ImGui::StyleColorsDark()` in `Application::init()`. Re-apply when `themeIndex` changes.
+- `Widgets`: `IconButton(...)` with drawn icons (folder, gear, chart, power), hover/active states, and a panel/label helper.
+- `SystemControls::Render(AppState&)`: real-time clock (`std::chrono` + `localtime_s`, HH:MM:SS and date) and the PWR button (power icon, red hover) that sets `state.shutdownRequested = true`. Place both in the taskbar's right end (coordinate positions with Kim).
+- Cross-module visual consistency and resize checks.
+
+## 6. Shared interfaces
+
+Defined in `include/core/AppState.h`. Documented in `docs/ARCHITECTURE.md` (sections "Shared state" and "Module contract"). Every module's public interface is one function, `void <Module>::Render(AppState& state)`.
+
+## 7. UI design
+
+- Dark, restrained palette: navy and charcoal backgrounds, a single blue accent (≈ `#4A7BE0`), and red only for PWR.
+- Wallpaper drawn with ImGui primitives; no emoji or system fonts. Icons are drawn with `ImDrawList` shapes.
+- App windows: rounded corners and consistent padding (from Theme), kept above the taskbar.
+- Taskbar: 48 px tall, semi-opaque dark, with icon buttons on the left/center and the clock and PWR on the right.
+
+## 8. Development sequence and milestones
+
+| Milestone | Content | Status |
+|---|---|---|
+| M1 Foundation | CMake, deps, GLFW/GL/ImGui init, loop, shutdown | DONE 2026-10-09 |
+| M2 Desktop | Wallpaper, shared state, docs | DONE 2026-10-09 |
+| M3 Shared UI | Theme, Widgets, clock, PWR (Lorens) | TODO |
+| M4 Taskbar + apps | Taskbar, File Explorer, Settings (Kim) | TODO |
+| M5 Task Manager | Process data + table (Byron) | TODO |
+| M6 Integration | All `Render` calls wired; full test checklist | TODO |
+| M7 Docs + PPT | Final README/handoff/PPT guide refresh, screenshots | TODO |
+
+M3–M5 can run in parallel; each depends only on M1/M2. Kim's taskbar buttons should use Lorens's `Widgets::IconButton` once it exists. Until then a plain `ImGui::Button` is fine and can be swapped later.
+
+## 9. Integration strategy
+
+1. Each member works on their own branch and their own files only.
+2. When a module compiles and works on its own (temporarily calling it locally is fine), open a PR to `development`.
+3. Nathan adds the single `<Module>::Render(state_);` line in `Application::renderFrame()` (the comment block lists the order) during review.
+4. After each merge, everyone pulls `development`, rebuilds, and runs the test checklist below.
+5. `development` → `main` only when the full checklist passes.
+
+## 10. Testing plan
+
+Use the checklist in `SESSION_HANDOFF.md` ("Test checklist"). Mark each test PASS, FAIL or NOT RUN. Never mark a test PASS without running it.
+
+## 11. Risks and mitigations
+
+| Risk | Mitigation |
+|---|---|
+| Members edit `Application.cpp` or `AppState.h` simultaneously → merge conflicts | Only Nathan edits them; changes are requested in chat first |
+| FetchContent needs internet + git on first configure | Documented in README; after the first configure, the deps are cached in `out/` |
+| GPU driver ignores vsync → 100% CPU | Loop uses `glfwWaitEventsTimeout` (verified ~0–5% CPU idle) |
+| Apps overlap taskbar | `kTaskbarHeight` constant; apps clamp position/size above it |
+| Assignment PDF not yet checked by Claude | Group member with the PDF cross-checks section 2 |
+
+## 12. Definition of done
+
+- Every requirement in section 2 is marked DONE with a test result of PASS.
+- Clean configure + build of `x64-debug` and `x64-release` with no errors.
+- PWR and the window close button both exit with code 0.
+- Documentation matches the code. `SESSION_HANDOFF.md` is current.

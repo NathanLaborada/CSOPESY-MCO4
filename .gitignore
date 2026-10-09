@@ -1,0 +1,17 @@
+# CMake / Visual Studio build output
+out/
+build/
+.vs/
+CMakeUserPresets.json
+*.user
+*.suo
+
+# Binaries
+*.exe
+*.pdb
+*.ilk
+*.obj
+*.lib
+
+# Dear ImGui layout file (disabled in code, ignored just in case)
+imgui.ini
