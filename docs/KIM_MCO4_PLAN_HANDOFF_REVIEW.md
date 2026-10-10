@@ -8,6 +8,7 @@
 * **Commit SHA inspected:** `b7109d5f90a0c6ec80fd8abf4be3cd975160e967` (`b7109d5` — "Merge pull request #1 from NathanLaborada/feature/lorens-ui-framework")
 * **Remote sync status:** local `main` == `origin/main` at review time. Remote heads: `main` (b7109d5), `feature/lorens-ui-framework` (3255749). **No `development` branch exists.**
 * **Review status:** COMPLETE (documentation review only; no code built or run)
+* **Report provenance:** this review was committed and pushed to `origin/main` as **`c8facb4`** ("docs: add Kim's MCO4 plan and session handoff review", 1 file, documentation only). Later edits to this file are listed by `git log --oneline -- docs/KIM_MCO4_PLAN_HANDOFF_REVIEW.md`.
 * **Documents inspected:** `PROJECT_PLAN.md` (137 lines), `SESSION_HANDOFF.md` (188 lines), `docs/ARCHITECTURE.md` (targeted), `include/core/app_state.h`, `include/ui/widgets.h`, `include/ui/theme.h`, `include/ui/system_controls.h`, `src/core/application.cc` (targeted), `CMakeLists.txt` (targeted), `README.md`, `docs/replies/reply-gpt1.md` (the review prompt)
 * **Documents NOT available:** assignment PDF `MO4 - Desktop_GUI.pdf` — `find . -iname "*.pdf"` returns nothing
 
@@ -166,7 +167,7 @@ Dependency-aware, limited to my responsibilities:
 * `src/core/application.cc` — line 69 `StyleColorsDark()`, lines 111–116 commented integration points
 * `CMakeLists.txt` — line 46 source glob
 * Git: `b7109d5` (merge PR #1), `3255749` (PWR fix), `11f302b` (theme/widgets/system controls), `568633b` (style rename), `a9cb3f7`/`f1c6f62` (initial)
-* GitHub: https://github.com/NathanLaborada/CSOPESY-MCO4 (PR #1 merged into `main`)
+* GitHub: https://github.com/NathanLaborada/CSOPESY-MCO4 (PR #1 merged into `main`; this report pushed as `c8facb4`)
 * Review prompt: `docs/replies/reply-gpt1.md`
 
 ## 12. Progress Checkpoint and Resume Instructions
@@ -174,7 +175,7 @@ Dependency-aware, limited to my responsibilities:
 * **Current review status:** **COMPLETE.** All 7 phases done; this file contains the final findings.
 * **Completed review steps:** baseline captured → checkpoint created → plan read → handoff read → responsibilities extracted (§6) → plan/handoff/repo cross-check (§7) → independent verification (§8) → QA pass.
 * **Remaining review steps:** none. Remaining **project** work is §10 (implementation), which belongs to me in a future session, not to this review.
-* **Last verified repository state:** `main` @ `b7109d5`, local == `origin/main`; untracked at last check: `.DS_Store`, `.idea/`, `docs/.DS_Store`, `docs/replies/`, plus this report (pre-commit).
-* **Exact next action:** commit + push this report (`docs/KIM_MCO4_PLAN_HANDOFF_REVIEW.md`), then in the next work session start §10 step 1 (ask the three questions) and step 2 (taskbar).
+* **Last verified repository state:** `main` @ **`c8facb4`** (this report), local == `origin/main`, re-verified after the push. Prior review baseline was `b7109d5`. Still untracked: `.DS_Store`, `.idea/`, `docs/.DS_Store`, `docs/replies/`.
+* **Exact next action:** ~~commit + push this report~~ **DONE — `c8facb4` is on GitHub.** Next: §10 step 1 (ask Nathan about the `development` branch, theme re-apply ownership, and the PDF cross-check) and §10 step 2 (create `include/ui/taskbar.h` + `src/ui/taskbar.cc`).
 * **Any ongoing operation or blocker:** none running; blockers recorded in §9 (PDF, `development` branch, theme re-apply ownership).
 * **What the next agent must read first:** this file (§12), then `PROJECT_PLAN.md` §5, then the `SESSION_HANDOFF.md` top snapshot.
