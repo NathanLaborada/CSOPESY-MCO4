@@ -12,7 +12,7 @@ main.cc
               1. desktop::Render(state)          [DONE]        Nathan  wallpaper (background draw list)
               2. taskbar::Render(state)          [IMPLEMENTED] Kim     bottom bar, launches apps
               3. system_controls::Render(state)  [IMPLEMENTED] Lorens  clock + PWR button
-              4. file_explorer::Render(state)    [PLANNED]     Kim
+              4. file_explorer::Render(state)    [IMPLEMENTED] Kim
               5. settings::Render(state)         [PLANNED]     Kim
               6. task_manager::Render(state)     [PLANNED]     Byron
 
