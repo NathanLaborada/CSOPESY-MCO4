@@ -6,11 +6,11 @@ Read this first. The current snapshot stays at the top; the session log below is
 
 | Item | Status |
 |---|---|
-| Stage | M1 Foundation + M2 Desktop **done**; ready for Kim, Byron and Lorens to start in parallel |
+| Stage | M1 Foundation + M2 Desktop **done**; M3 Shared UI (Lorens) **implemented on feature branch**, awaiting integration; Kim/Byron can start in parallel |
 | Last milestone | Nathan's core: CMake, GLFW/OpenGL 3.3/ImGui init, loop, shutdown, wallpaper, `AppState` |
 | Build | **PASS**: `x64-debug` and `x64-release` configure + build, 0 errors, 0 warnings in project code (`/W4`), VS Community 2026 18.10 / MSVC 14.51 / CMake 4.3.1 |
-| Tests | Launch, wallpaper, resize, window-close exit (code 0), idle CPU: **PASS**. Clock, PWR, taskbar, apps: **NOT RUN** (not implemented yet) |
-| Branch | `main` on https://github.com/NathanLaborada/CSOPESY-MCO4. The Google-style rename (session 2) is **uncommitted** in Nathan's working copy |
+| Tests | Launch, wallpaper, resize, window-close exit (code 0), idle CPU: **PASS**. Theme/widgets/system_controls compile + launch smoke test: **PASS** (Linux, temp wiring). PWR-click shutdown, taskbar, apps: **NOT RUN** (see session 3) |
+| Branch | `main` on https://github.com/NathanLaborada/CSOPESY-MCO4 plus `feature/lorens-ui-framework` (Lorens, unmerged). No `development` branch exists yet. The Google-style rename (session 2) is **committed** as `568633b Changes with C++ style` |
 | Code style | Google C++ Style Guide: `lower_snake_case.cc/.h`, `desktop_os::` namespace, `.clang-format` in repo root (see docs/ARCHITECTURE.md "Coding style") |
 | Blockers | None. Assignment PDF was not in the workspace, so requirements come from the prompt file. Someone must cross-check them against the PDF |
 | Next steps | Nathan: commit + push session 2, create `development` · Lorens: theme/widgets/system_controls · Kim: taskbar/file_explorer/settings · Byron: task_manager · Nathan: wire each `Render` call as modules arrive |
@@ -20,8 +20,8 @@ Read this first. The current snapshot stays at the top; the session log below is
 | Graphics init + shutdown | Implemented, verified |
 | Desktop wallpaper (3 styles) | Implemented, verified (all 3 screenshotted) |
 | Shared `AppState` | Implemented |
-| Theme / Widgets | Not started (Lorens) |
-| Clock / PWR button | Not started (Lorens). Shutdown path ready and verified via window close |
+| Theme / Widgets | Implemented (Lorens) on `feature/lorens-ui-framework`; Linux build PASS, smoke-tested with temp wiring; needs Nathan wiring (see session 3) |
+| Clock / PWR button | Implemented (Lorens) on `feature/lorens-ui-framework`. Smoke test PASS (app ran 8 s, no crash). PWR-click exit and cross-size readability: **NOT RUN** (button not yet wired in committed code). Shutdown path itself already verified via window close |
 | Taskbar | Not started (Kim) |
 | File Explorer / Settings | Not started (Kim) |
 | Task Manager | Not started (Byron) |
@@ -145,3 +145,42 @@ or: Visual Studio > File > Open > Folder > x64 Debug > Build All > DesktopOS.exe
 **Next member handoff**
 1. Nathan: review `git diff --staged` / `git status`, then commit (e.g. `style: follow Google C++ Style Guide`) and push. Create the `development` branch.
 2. Everyone: follow the module contract in docs/ARCHITECTURE.md, which now has a Google-style header example. Press Ctrl+K, Ctrl+D in Visual Studio before committing.
+
+### Session 3: 2026-10-10, Lorens (via Pi on Nobara Linux)
+
+**Objective:** Lorens's assignment: shared theme, reusable widgets, live clock + PWR button, built and tested on Nobara Linux without touching other members' files.
+
+**Work completed**
+- `include/ui/theme.h` + `src/ui/theme.cc`: `theme::Apply(int)` starts from `StyleColorsDark()` then applies navy/charcoal colors with a restrained blue accent (#4A7BE0), plus rounding/spacing. Two themes (`kThemeNames` = Midnight, Slate); out-of-range index falls back to 0.
+- `include/ui/widgets.h` + `src/ui/widgets.cc`: `widgets::IconButton(id, kind, size, active)` with drawn geometric icons (Folder, Settings, Task Manager, Power), hover/held/active states, red hover/held tint for Power. Plus `Icon()` (inline listing icons) and `MutedText()` (dimmed label helper).
+- `include/ui/system_controls.h` + `src/ui/system_controls.cc`: `system_controls::Render(AppState&)` shows live HH:MM:SS + local date (`std::chrono`, `localtime_r` on Linux / `localtime_s` on Windows) and a PWR button that sets `state.shutdown_requested = true`. Transparent overlay restricted to the rightmost `kSystemControlsWidth` (260 px) of the 48 px taskbar strip; date hides on narrow windows (<600 px).
+- Verified the actual Git state first: session 2's rename is committed (`568633b`); there is still no `development` branch, so the work is on `feature/lorens-ui-framework` based on `main`. No PDF found in the workspace, so no new requirements were invented.
+- `src/core/application.cc` was patched ONLY temporarily for the smoke test, then byte-restored. Final `git diff` is empty; `git status` shows just the 6 new files.
+
+**Files created:** `include/ui/theme.h`, `src/ui/theme.cc`, `include/ui/widgets.h`, `src/ui/widgets.cc`, `include/ui/system_controls.h`, `src/ui/system_controls.cc`. Nothing else modified. (`out/` is gitignored; the Linux build dir is `out/build/nobara-debug`.)
+
+**Build and test results**
+- Environment: Nobara Linux (Fedora-based), Wayland session, gcc 16.2.1, CMake 4.3.0. No MSVC/Windows presets usable here; `CMakePresets.json` untouched.
+- Blocker hit: default configure failed on `Xinerama headers not found` and `sudo` is unavailable in this sandbox, so `libXinerama-devel` etc. could not be installed. Workaround (build-dir-local only, no repo change): `cmake -S . -B out/build/nobara-debug -DCMAKE_BUILD_TYPE=Debug -DGLFW_BUILD_X11=OFF -DGLFW_BUILD_WAYLAND=ON`. Windows/MSVC builds are unaffected (they use the Win32 backend, not X11).
+- `cmake --build out/build/nobara-debug --parallel`: **PASS**, 0 errors, all 3 new modules compiled and linked into `DesktopOS`.
+- `g++ -fsyntax-only` on the 3 new `.cc` files against ImGui v1.91.9b headers: **PASS**.
+- `git diff --check`: **PASS**. All new lines within 80 columns (Google style, `.cc`/`.h`, `desktop_os::` namespaces, `kPascalCase` constants).
+- Runtime smoke test with TEMPORARY wiring only (`theme::Apply(0)` + `system_controls::Render(state_)` in `application.cc`): app launched and ran 8 s with clock/PWR visible, no crash, killed by `timeout` (exit 124 = still running, as expected). No `clang-format` binary on this machine, so formatting was done by hand following `.clang-format` (Google base).
+- NOT RUN: PWR-click → exit code check (needs a GUI click; wiring is not yet in committed code), hover/active pixel inspection, multi-size readability, Windows build.
+
+**Current limitations**
+- Modules are implemented but not yet called by the committed `Application::RenderFrame()`; on `main` they compile but have no visible effect until Nathan wires them (3 lines, below).
+- Default font still ProggyClean; a nicer bundled font must be loaded in `Init()` by Nathan if wanted.
+- High-DPI scaling not handled (pre-existing limitation).
+
+**Decisions (please don't reverse without discussing)**
+- Power icon uses a red hover/held tint inside `IconButton`; all other icons use the blue accent. Kim gets selected-state via the `active` param plus an outline ring.
+- `kSystemControlsWidth = 260.0f` reserves the taskbar's right end. Kim: keep launch buttons clear of that strip.
+- Theme picker data lives in `theme::kThemeNames`/`kThemeCount` (mirrors `desktop::kWallpaperNames`); Settings should reuse it, not duplicate names.
+
+**Next member handoff**
+1. **Nathan (3-line integration in `src/core/application.cc`):** add `#include "ui/theme.h"` and `#include "ui/system_controls.h"`; replace `ImGui::StyleColorsDark();` with `theme::Apply(state_.theme_index);`; add `system_controls::Render(state_);` in `RenderFrame()` between the taskbar and file_explorer calls. Optionally re-apply the theme when `theme_index` changes.
+2. **Kim:** use `widgets::IconButton("file_explorer", widgets::IconKind::kFolder, ...)` (and `kSettings`, `kTaskManager`) for taskbar buttons; read `theme::kThemeNames` for the Settings theme combo (writes `state.theme_index`); keep launch buttons out of the rightmost 260 px.
+3. **Byron:** `widgets::Icon()` + `MutedText()` are available for Task Manager rows/headers if useful.
+4. **Anyone with the assignment PDF:** cross-check PROJECT_PLAN.md section 2 (requirements came from the prompt file, PDF was never in the workspace).
+5. Reproduce: `cmake -S . -B out/build/nobara-debug -DCMAKE_BUILD_TYPE=Debug -DGLFW_BUILD_X11=OFF -DGLFW_BUILD_WAYLAND=ON && cmake --build out/build/nobara-debug --parallel && ./out/build/nobara-debug/DesktopOS` (on Nobara; needs the Wayland/X11 dev packages per README troubleshooting if X11 build is wanted).
