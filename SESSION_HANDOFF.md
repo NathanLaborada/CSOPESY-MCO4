@@ -47,6 +47,23 @@ Read this first. The current snapshot stays at the top; the session log below is
 | ImGui sources compiled exactly once | PASS | Only the `imgui` target lists them |
 | Clean build attempted | PASS | Fresh `out/` on first configure |
 
+### Post-integration acceptance checklist (after Nathan wires the modules)
+
+Source: `docs/replies/reply-gpt5.md`. Only mark a requirement DONE when its
+row here passes on a real integrated build — macOS smoke tests only prove
+the code builds and launches.
+
+| Test | What counts as passing |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Taskbar layout | Fixed, full-width, 48-pixel-high bottom bar that does not overlap clock/PWR controls |
+| Launch buttons | File Explorer and Settings open correctly; Task Manager opens once Byron's implementation exists |
+| Open indicators | Indicator matches each app's visibility and disappears when the app closes |
+| File Explorer | Sidebar shortcuts, breadcrumb navigation, selection, and double-click folder navigation all work |
+| Settings | All four categories work, the wallpaper selector changes the wallpaper, and the theme selector visibly changes the theme |
+| Window behavior | Closing an app does not close the desktop, and the app can be reopened |
+| Resizing | Windows remain usable and do not obstruct the taskbar |
+| Windows/MSVC | `x64-debug` + `x64-release` build clean; record the tester's name and actual results — do not infer a Windows pass from a macOS build |
+
 ---
 
 ## Session log
@@ -254,3 +271,9 @@ or: Visual Studio > File > Open > Folder > x64 Debug > Build All > DesktopOS.exe
 **Work:** `include/apps/settings.h` + `src/apps/settings.cc` (commit `caf5e7c`): categories System / Display / Personalization / About in a left list; System + About show simulated info under an explicit "simulated dummy data" banner; Personalization has the wallpaper combo → `state.wallpaper_index` (live via desktop) and theme combo → `state.theme_index` (visible only after Nathan wires `theme::Apply`); Display holds disabled placeholder controls. Bound to `state.show_settings`, fixed title, min 480×300, clamped above the taskbar like File Explorer. Note: plan §2 calls the pickers "optional enhancements" while §5 assigns them to E1 — both were built (trivial; §5 wins).
 **Build/test:** macOS clang PASS, 0 warnings in `settings.cc`. Fixed pre-commit: non-portable GNU compound literals (`&(int){0}`) that MSVC would reject. Temp-wired smoke ran 6 s OK; `application.cc` reverted byte-identical (`git diff --exit-code` clean), binary rebuilt. NOT RUN: clicks/visual, Windows/MSVC build.
 **Next:** Nathan wires the six `Render` calls + `theme::Apply`; then the real-display test table in `docs/replies/reply-gpt4.md`.
+
+### Session 7: 2026-10-10, Kim (via Pi on macOS)
+
+**Objective:** Reconcile the last stale plan rows and record the post-integration acceptance checklist (reply-gpt5 review).
+**Work:** `PROJECT_PLAN.md` M3/A3/A4/V1 changed TODO → IN PROGRESS with explicit "merged but not wired/verified" qualifiers — no requirement was marked DONE; Nathan and Lorens should confirm these rows. Added the "Post-integration acceptance checklist" section above (source: `docs/replies/reply-gpt5.md`) for whoever runs the integrated tests (Windows/MSVC row included).
+**No code changes.** All three Kim modules remain `0ada3c0` / `bdca7d1` / `caf5e7c`; `application.cc` still awaits Nathan's wiring; branch/PDF questions still open in the group chat.

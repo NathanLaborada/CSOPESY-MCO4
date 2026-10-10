@@ -1,6 +1,6 @@
 # PROJECT_PLAN — CSOPESY MO4 Desktop-Style OS Mockup
 
-Last updated: 2026-10-10 (Kim: B1–B3 marked IN PROGRESS; original: Nathan's core session 2026-10-09).
+Last updated: 2026-10-10 (Kim: B1–B3/D1/E1 statuses; M3/A3/A4/V1 reconciled to IN PROGRESS — merged in PR #1 but not wired/verified; confirm with Nathan/Lorens).
 Status legend: **DONE** (implemented and verified) · **TODO** (not started) · **IN PROGRESS**.
 
 ## 1. Overview
@@ -15,8 +15,8 @@ This is a desktop-style operating system mockup written in C++17 with OpenGL, GL
 |---|---|---|---|
 | A1 | Desktop background fills the client area | Nathan | DONE |
 | A2 | Wallpaper (gradient / drawn pattern) | Nathan | DONE (3 wallpapers) |
-| A3 | Real-time clock showing system time | Lorens | TODO |
-| A4 | Clearly identifiable PWR button that closes the app gracefully | Lorens (button) / Nathan (shutdown path) | Shutdown path DONE, button TODO |
+| A3 | Real-time clock showing system time | Lorens | IN PROGRESS (merged PR #1; not wired, not verified) |
+| A4 | Clearly identifiable PWR button that closes the app gracefully | Lorens (button) / Nathan (shutdown path) | Shutdown path DONE; button IN PROGRESS (merged; not wired, not verified) |
 | A5 | Resources cleaned up on shutdown | Nathan | DONE |
 | B1 | Fixed taskbar, top or bottom | Kim | IN PROGRESS |
 | B2 | ≥3 working icon buttons: File Explorer, System Settings, Task Manager | Kim | IN PROGRESS |
@@ -25,7 +25,7 @@ This is a desktop-style operating system mockup written in C++17 with OpenGL, GL
 | C2 | Process name, CPU %, memory columns with dummy data | Byron | TODO |
 | D1 | File Explorer: title/nav area, placeholder listing, content area, icons, selection | Kim | IN PROGRESS |
 | E1 | System Settings: title/nav, categories, placeholder info, demo controls | Kim | IN PROGRESS |
-| V1 | Consistent dark theme, hover/active states, usable when resized | Lorens (theme) / all | Resizing of desktop DONE; theme TODO |
+| V1 | Consistent dark theme, hover/active states, usable when resized | Lorens (theme) / all | Resizing of desktop DONE; theme IN PROGRESS (merged; not wired, not verified) |
 
 **Optional enhancements** (only after all of the above):
 - Wallpaper picker in Settings (`wallpaper_index` already supported by Desktop).
@@ -101,7 +101,7 @@ Defined in `include/core/app_state.h`. Documented in `docs/ARCHITECTURE.md` (sec
 |---|---|---|
 | M1 Foundation | CMake, deps, GLFW/GL/ImGui init, loop, shutdown | DONE 2026-10-09 |
 | M2 Desktop | Wallpaper, shared state, docs | DONE 2026-10-09 |
-| M3 Shared UI | Theme, Widgets, clock, PWR (Lorens) | TODO |
+| M3 Shared UI | Theme, Widgets, clock, PWR (Lorens) | IN PROGRESS (merged in PR #1 `b7109d5`; awaiting wiring + verification) |
 | M4 Taskbar + apps | Taskbar, File Explorer, Settings (Kim) | IN PROGRESS (`0ada3c0`, `bdca7d1`, `caf5e7c` coded; acceptance tests pending) |
 | M5 Task Manager | Process data + table (Byron) | TODO |
 | M6 Integration | All `Render` calls wired; full test checklist | TODO |
