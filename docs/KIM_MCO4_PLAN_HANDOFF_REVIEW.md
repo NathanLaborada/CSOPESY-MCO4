@@ -167,7 +167,7 @@ Dependency-aware, limited to my responsibilities:
 * `src/core/application.cc` — line 69 `StyleColorsDark()`, lines 111–116 commented integration points
 * `CMakeLists.txt` — line 46 source glob
 * Git: `b7109d5` (merge PR #1), `3255749` (PWR fix), `11f302b` (theme/widgets/system controls), `568633b` (style rename), `a9cb3f7`/`f1c6f62` (initial)
-* GitHub: https://github.com/NathanLaborada/CSOPESY-MCO4 (PR #1 merged into `main`; this report pushed as `c8facb4`)
+* GitHub: <https://github.com/NathanLaborada/CSOPESY-MCO4> (PR #1 merged into `main`; this report pushed as `c8facb4`)
 * Review prompt: `docs/replies/reply-gpt1.md`
 
 ## 12. Progress Checkpoint and Resume Instructions
