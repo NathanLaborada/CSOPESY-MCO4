@@ -15,8 +15,10 @@ inline constexpr const char* kThemeNames[kThemeCount] = {"Midnight",
                                                          "Slate"};
 
 // Applies the theme selected by `theme_index`. Any out-of-range value falls
-// back to theme 0. Call once during init and again whenever theme_index
-// changes. Safe to call before the first frame.
+// back to theme 0. Call once during init AND again whenever theme_index
+// changes (e.g. after Settings writes it); otherwise a picker change updates
+// the stored index without changing the appearance. Safe to call before the
+// first frame and cheap enough to call every frame if the host prefers.
 void Apply(int theme_index);
 
 }  // namespace theme

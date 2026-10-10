@@ -66,8 +66,14 @@ void DrawTaskManager(ImDrawList* draw_list, ImVec2 center, float radius,
 
 void DrawPower(ImDrawList* draw_list, ImVec2 center, float radius,
                ImU32 color) {
-  const float start = -0.35f * kTwoPi;
-  const float end = 0.85f * kTwoPi;
+  // Open ring with a gap centered at the top. ImGui angles start at +x and
+  // grow clockwise (y points down), so the top is at -pi/2; the arc runs
+  // from one side of the gap around to the other, spanning under 360
+  // degrees so it never overlaps itself.
+  constexpr float kHalfPi = 1.5707963f;
+  constexpr float kGapHalf = 0.45f;
+  const float start = -kHalfPi + kGapHalf;
+  const float end = -kHalfPi - kGapHalf + kTwoPi;
   draw_list->PathArcTo(center, radius * 0.75f, start, end, 28);
   draw_list->PathStroke(color, 0, 2.5f);
   draw_list->AddLine(ImVec2(center.x, center.y - radius * 0.95f),

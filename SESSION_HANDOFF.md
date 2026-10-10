@@ -184,3 +184,5 @@ or: Visual Studio > File > Open > Folder > x64 Debug > Build All > DesktopOS.exe
 3. **Byron:** `widgets::Icon()` + `MutedText()` are available for Task Manager rows/headers if useful.
 4. **Anyone with the assignment PDF:** cross-check PROJECT_PLAN.md section 2 (requirements came from the prompt file, PDF was never in the workspace).
 5. Reproduce: `cmake -S . -B out/build/nobara-debug -DCMAKE_BUILD_TYPE=Debug -DGLFW_BUILD_X11=OFF -DGLFW_BUILD_WAYLAND=ON && cmake --build out/build/nobara-debug --parallel && ./out/build/nobara-debug/DesktopOS` (on Nobara; needs the Wayland/X11 dev packages per README troubleshooting if X11 build is wanted).
+
+**Review fix (2026-10-10, same branch):** `DrawPower()` arc spanned 432 degrees (overlapping ring). Fixed to an open ring with a ~52-degree gap centered at the top plus the vertical line. Verified with a real screenshot: clock `21:36:41` + date next to a correct power symbol. Also sharpened the `theme::Apply` doc comment: the host must call it once at init AND whenever `theme_index` changes. `PROJECT_PLAN.md` status table (still TODO for M3) left for Nathan/integration to update alongside the other members' rows.
