@@ -6,14 +6,14 @@ Read this first. The current snapshot stays at the top; the session log below is
 
 | Item | Status |
 |---|---|
-| Stage | M1 Foundation + M2 Desktop **done**; M3 Shared UI (Lorens) **merged to `main`** (PR #1, `b7109d5`) but **not yet wired** in `application.cc`; taskbar **implemented** (Kim, `0ada3c0`), not yet wired; File Explorer **implemented** (Kim, `bdca7d1`), not yet wired; Settings / Task Manager not started; Kim/Byron working in parallel |
+| Stage | M1 Foundation + M2 Desktop **done**; M3 Shared UI (Lorens) **merged to `main`** (PR #1, `b7109d5`) but **not yet wired** in `application.cc`; taskbar **implemented** (Kim, `0ada3c0`), not yet wired; File Explorer (Kim, `bdca7d1`) and Settings (Kim, `caf5e7c`) **implemented**, not yet wired; Task Manager not started; Kim/Byron working in parallel |
 | Last milestone | Nathan's core: CMake, GLFW/OpenGL 3.3/ImGui init, loop, shutdown, wallpaper, `AppState` |
 | Build | **PASS**: `x64-debug` and `x64-release` configure + build, 0 errors, 0 warnings in project code (`/W4`), VS Community 2026 18.10 / MSVC 14.51 / CMake 4.3.1 |
 | Tests | Launch, wallpaper, resize, window-close exit (code 0), idle CPU: **PASS**. Theme/widgets/system_controls compile + launch smoke test: **PASS** (Linux, temp wiring). PWR-click shutdown, taskbar, apps: **NOT RUN** (see session 3) |
-| Branch | `main` on https://github.com/NathanLaborada/CSOPESY-MCO4 plus `feature/lorens-ui-framework` (Lorens, unmerged). No `development` branch exists yet. The Google-style rename (session 2) is **committed** as `568633b Changes with C++ style` |
+| Branch | `main` on https://github.com/NathanLaborada/CSOPESY-MCO4; `feature/lorens-ui-framework` **merged via PR #1** (`b7109d5`). No `development` branch exists yet. The Google-style rename (session 2) is **committed** as `568633b Changes with C++ style` |
 | Code style | Google C++ Style Guide: `lower_snake_case.cc/.h`, `desktop_os::` namespace, `.clang-format` in repo root (see docs/ARCHITECTURE.md "Coding style") |
-| Blockers | None. Assignment PDF was not in the workspace, so requirements come from the prompt file. Someone must cross-check them against the PDF |
-| Next steps | Nathan: create `development` · Lorens: theme/widgets/system_controls (done, merged) · Kim: settings (E1) next (taskbar + File Explorer done, sessions 4-5) · Byron: task_manager · Nathan: wire each `Render` call as modules arrive |
+| Blockers | No code blockers. Open items: assignment PDF missing (requirements came from the prompt file, needs cross-check) · `development` branch does not exist yet (PR target undecided) |
+| Next steps | Nathan: create `development` · Lorens: theme/widgets/system_controls (done, merged) · Kim: all three modules coded (sessions 4–6), awaiting Nathan integration + acceptance tests · Byron: task_manager · Nathan: wire each `Render` call as modules arrive |
 
 | Feature | State |
 |---|---|
@@ -24,7 +24,7 @@ Read this first. The current snapshot stays at the top; the session log below is
 | Clock / PWR button | Implemented (Lorens) on `feature/lorens-ui-framework`. Smoke test PASS (app ran 8 s, no crash). PWR-click exit and cross-size readability: **NOT RUN** (button not yet wired in committed code). Shutdown path itself already verified via window close |
 | Taskbar | Implemented (Kim, `0ada3c0`); not yet wired in `application.cc`; click/visual checklist rows NOT RUN (see session 4) |
 | File Explorer | Implemented (Kim, `bdca7d1`); not yet wired; tests NOT RUN (session 5) |
-| Settings | Not started (Kim) |
+| Settings | Implemented (Kim, `caf5e7c`); not yet wired; tests NOT RUN (session 6) |
 | Task Manager | Not started (Byron) |
 
 ### Test checklist
@@ -247,3 +247,10 @@ or: Visual Studio > File > Open > Folder > x64 Debug > Build All > DesktopOS.exe
 1. **Nathan:** wire `file_explorer::Render(state_);` at its marked slot in the commented integration block.
 2. **Kim:** Settings (E1) is the next module; the theme-combo question for Nathan is still open (see review report F6).
 3. **Anyone on Windows:** run the taskbar + File Explorer checklist rows once wired; all visual/click rows remain NOT RUN.
+
+### Session 6: 2026-10-10, Kim (via Pi on macOS)
+
+**Objective:** E1 — the Settings window (Kim's last module).
+**Work:** `include/apps/settings.h` + `src/apps/settings.cc` (commit `caf5e7c`): categories System / Display / Personalization / About in a left list; System + About show simulated info under an explicit "simulated dummy data" banner; Personalization has the wallpaper combo → `state.wallpaper_index` (live via desktop) and theme combo → `state.theme_index` (visible only after Nathan wires `theme::Apply`); Display holds disabled placeholder controls. Bound to `state.show_settings`, fixed title, min 480×300, clamped above the taskbar like File Explorer. Note: plan §2 calls the pickers "optional enhancements" while §5 assigns them to E1 — both were built (trivial; §5 wins).
+**Build/test:** macOS clang PASS, 0 warnings in `settings.cc`. Fixed pre-commit: non-portable GNU compound literals (`&(int){0}`) that MSVC would reject. Temp-wired smoke ran 6 s OK; `application.cc` reverted byte-identical (`git diff --exit-code` clean), binary rebuilt. NOT RUN: clicks/visual, Windows/MSVC build.
+**Next:** Nathan wires the six `Render` calls + `theme::Apply`; then the real-display test table in `docs/replies/reply-gpt4.md`.

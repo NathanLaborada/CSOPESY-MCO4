@@ -22,7 +22,7 @@ called by `Application::RenderFrame()`; only Nathan wires them in.
 
 Supporting shared UI (no per-frame call from Application unless Lorens needs one):
 
-- `Theme` [IMPLEMENTED] (Lorens): colors and style. Applied once in `Application::Init()` and re-applied when `theme_index` changes.
+- `Theme` [IMPLEMENTED] (Lorens): colors and style. `theme::Apply()` exists, but `application.cc` still calls `ImGui::StyleColorsDark()` — Nathan swaps it in and re-applies on `theme_index` changes (pending integration).
 - `Widgets` [IMPLEMENTED] (Lorens): reusable icon buttons, panels and labels used by every module.
 
 ## Graphics stack
