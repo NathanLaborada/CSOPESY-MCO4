@@ -23,7 +23,7 @@ This is a desktop-style operating system mockup written in C++17 with OpenGL, GL
 | B3 | Taskbar remains visible while apps are open | Kim | IN PROGRESS |
 | C1 | Task Manager with Processes section and table | Byron | TODO |
 | C2 | Process name, CPU %, memory columns with dummy data | Byron | TODO |
-| D1 | File Explorer: title/nav area, placeholder listing, content area, icons, selection | Kim | TODO |
+| D1 | File Explorer: title/nav area, placeholder listing, content area, icons, selection | Kim | IN PROGRESS |
 | E1 | System Settings: title/nav, categories, placeholder info, demo controls | Kim | TODO |
 | V1 | Consistent dark theme, hover/active states, usable when resized | Lorens (theme) / all | Resizing of desktop DONE; theme TODO |
 
@@ -100,7 +100,7 @@ Defined in `include/core/app_state.h`. Documented in `docs/ARCHITECTURE.md` (sec
 | M1 Foundation | CMake, deps, GLFW/GL/ImGui init, loop, shutdown | DONE 2026-10-09 |
 | M2 Desktop | Wallpaper, shared state, docs | DONE 2026-10-09 |
 | M3 Shared UI | Theme, Widgets, clock, PWR (Lorens) | TODO |
-| M4 Taskbar + apps | Taskbar, File Explorer, Settings (Kim) | IN PROGRESS (taskbar coded `0ada3c0`; apps pending) |
+| M4 Taskbar + apps | Taskbar, File Explorer, Settings (Kim) | IN PROGRESS (taskbar `0ada3c0`, File Explorer `bdca7d1` coded; Settings pending) |
 | M5 Task Manager | Process data + table (Byron) | TODO |
 | M6 Integration | All `Render` calls wired; full test checklist | TODO |
 | M7 Docs + PPT | Final README/handoff/PPT guide refresh, screenshots | TODO |

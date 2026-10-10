@@ -6,14 +6,14 @@ Read this first. The current snapshot stays at the top; the session log below is
 
 | Item | Status |
 |---|---|
-| Stage | M1 Foundation + M2 Desktop **done**; M3 Shared UI (Lorens) **merged to `main`** (PR #1, `b7109d5`) but **not yet wired** in `application.cc`; taskbar **implemented** (Kim, `0ada3c0`), not yet wired; File Explorer / Settings / Task Manager not started; Kim/Byron working in parallel |
+| Stage | M1 Foundation + M2 Desktop **done**; M3 Shared UI (Lorens) **merged to `main`** (PR #1, `b7109d5`) but **not yet wired** in `application.cc`; taskbar **implemented** (Kim, `0ada3c0`), not yet wired; File Explorer **implemented** (Kim, `bdca7d1`), not yet wired; Settings / Task Manager not started; Kim/Byron working in parallel |
 | Last milestone | Nathan's core: CMake, GLFW/OpenGL 3.3/ImGui init, loop, shutdown, wallpaper, `AppState` |
 | Build | **PASS**: `x64-debug` and `x64-release` configure + build, 0 errors, 0 warnings in project code (`/W4`), VS Community 2026 18.10 / MSVC 14.51 / CMake 4.3.1 |
 | Tests | Launch, wallpaper, resize, window-close exit (code 0), idle CPU: **PASS**. Theme/widgets/system_controls compile + launch smoke test: **PASS** (Linux, temp wiring). PWR-click shutdown, taskbar, apps: **NOT RUN** (see session 3) |
 | Branch | `main` on https://github.com/NathanLaborada/CSOPESY-MCO4 plus `feature/lorens-ui-framework` (Lorens, unmerged). No `development` branch exists yet. The Google-style rename (session 2) is **committed** as `568633b Changes with C++ style` |
 | Code style | Google C++ Style Guide: `lower_snake_case.cc/.h`, `desktop_os::` namespace, `.clang-format` in repo root (see docs/ARCHITECTURE.md "Coding style") |
 | Blockers | None. Assignment PDF was not in the workspace, so requirements come from the prompt file. Someone must cross-check them against the PDF |
-| Next steps | Nathan: create `development` · Lorens: theme/widgets/system_controls (done, merged) · Kim: file_explorer + settings (taskbar done, session 4) · Byron: task_manager · Nathan: wire each `Render` call as modules arrive |
+| Next steps | Nathan: create `development` · Lorens: theme/widgets/system_controls (done, merged) · Kim: settings (E1) next (taskbar + File Explorer done, sessions 4-5) · Byron: task_manager · Nathan: wire each `Render` call as modules arrive |
 
 | Feature | State |
 |---|---|
@@ -23,7 +23,8 @@ Read this first. The current snapshot stays at the top; the session log below is
 | Theme / Widgets | Implemented (Lorens) on `feature/lorens-ui-framework`; Linux build PASS, smoke-tested with temp wiring; needs Nathan wiring (see session 3) |
 | Clock / PWR button | Implemented (Lorens) on `feature/lorens-ui-framework`. Smoke test PASS (app ran 8 s, no crash). PWR-click exit and cross-size readability: **NOT RUN** (button not yet wired in committed code). Shutdown path itself already verified via window close |
 | Taskbar | Implemented (Kim, `0ada3c0`); not yet wired in `application.cc`; click/visual checklist rows NOT RUN (see session 4) |
-| File Explorer / Settings | Not started (Kim) |
+| File Explorer | Implemented (Kim, `bdca7d1`); not yet wired; tests NOT RUN (session 5) |
+| Settings | Not started (Kim) |
 | Task Manager | Not started (Byron) |
 
 ### Test checklist
@@ -39,7 +40,7 @@ Read this first. The current snapshot stays at the top; the session log below is
 | Window close exits cleanly | PASS | `CloseMainWindow()` → exit code 0 in ~100 ms, Debug and Release |
 | Idle CPU reasonable | PASS | ~0–5% of one core (was ~107% before throttling fix) |
 | Taskbar visible, ≥3 buttons, opens each app | NOT RUN | implemented `0ada3c0`, not wired; needs a real display (see session 4) |
-| Close app ≠ close desktop; reopen | NOT RUN | File Explorer / Settings / Task Manager not implemented; taskbar flag logic pending wiring |
+| Close app ≠ close desktop; reopen | NOT RUN | File Explorer implemented but unwired; Settings / Task Manager not implemented |
 | Task Manager table / names / CPU / memory | NOT RUN | not implemented |
 | CMake configure succeeds | PASS | `cmake --preset x64-debug` / `x64-release` |
 | Compiles without unresolved symbols | PASS | |
@@ -217,3 +218,32 @@ or: Visual Studio > File > Open > Folder > x64 Debug > Build All > DesktopOS.exe
 2. **Kim:** next = File Explorer (D1), then Settings (E1).
 3. **Anyone on Windows:** once wired, run the checklist rows for the taskbar and close-vs-reopen; macOS visual verification was not possible here.
 4. Review context: `docs/KIM_MCO4_PLAN_HANDOFF_REVIEW.md` (pushed as `c8facb4`, checkpoint updated in `33ec755`).
+
+### Session 5: 2026-10-10, Kim (via Pi on macOS)
+
+**Objective:** Kim's assignment part 2: requirement D1 — the File Explorer window.
+
+**Work completed**
+- `include/apps/file_explorer.h` + `src/apps/file_explorer.cc` (commit `bdca7d1`): `file_explorer::Render(AppState&)` with (a) sidebar — Quick access jumps (Desktop, Downloads, Documents) and This PC (Local Disk (C:)), (b) breadcrumb path bar where every segment is clickable to navigate up, (c) 4-column table (Name / Date modified / Type / Size) over a simulated in-memory tree rooted at "This PC", (d) drawn folder and paper icons, (e) full-row click-to-select, (f) double-click a folder to navigate into it, (g) "This folder is empty." placeholder state.
+- No real filesystem access — all placeholder data lives in an anonymous-namespace `Entry` tree (plan §5: "placeholder").
+- Window: fixed title "File Explorer", bound to `state.show_file_explorer` (own X closes, taskbar reopens), default 780×500 at (70, 56), min 460×260, and it clamps its bottom edge above `kTaskbarHeight` every frame using public ImGui API.
+- Reuses `widgets::Icon` and `widgets::MutedText` (session 3).
+
+**Files created:** `include/apps/file_explorer.h`, `src/apps/file_explorer.cc`; status lines updated in `docs/ARCHITECTURE.md` ([PLANNED] → [IMPLEMENTED]) and this session's rows below.
+
+**Build and test results**
+- macOS clang, existing `cmake-build-debug` tree: **PASS**, glob picked the file up automatically, 0 warnings in `file_explorer.cc` (the 3 build warnings are pre-existing OpenGL deprecation notices in `application.cc`).
+- **Bug found and fixed by local testing:** `FindPath` treated `path[0]` as a child of the root, so `{"This PC"}` never resolved and `DrawListing` dereferenced null → SIGSEGV (exit 139, caught with lldb backtrace). Fix: `path[0]` must equal the root's own name; segments after it walk children.
+- Rejected approach: `ImGui::FindWindowByName` / `ImGuiWindow` are **internal API** in ImGui v1.91.9b (`imgui_internal.h`) — the clamp now runs after `Begin` with public `Get/SetWindowPos`.
+- Temp wiring smoke test (taskbar + File Explorer + forced open flag): launched, **ran 7 s, no crash**; `git checkout` restored `application.cc` byte-identical (`git diff --exit-code` clean) and the binary was rebuilt.
+- **NOT RUN:** real clicks/navigation, visual inspection, Windows/MSVC build (no screen capture in this sandbox).
+
+**Decisions (please don't reverse without discussing)**
+- Path model: every path starts with the root segment `"This PC"`; the breadcrumb's first segment always jumps to the root.
+- Selection is a single string (`g_selected`), cleared on navigation — module-private state, no `AppState` change needed.
+- Files/folders icons are drawn shapes (accent folder, grey paper with folded corner) — no emoji or fonts, per plan §7.
+
+**Next member handoff**
+1. **Nathan:** wire `file_explorer::Render(state_);` at its marked slot in the commented integration block.
+2. **Kim:** Settings (E1) is the next module; the theme-combo question for Nathan is still open (see review report F6).
+3. **Anyone on Windows:** run the taskbar + File Explorer checklist rows once wired; all visual/click rows remain NOT RUN.
