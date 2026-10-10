@@ -13,7 +13,7 @@ Read this first. The current snapshot stays at the top; the session log below is
 | Branch | `main` on https://github.com/NathanLaborada/CSOPESY-MCO4 plus `feature/lorens-ui-framework` (Lorens, unmerged). No `development` branch exists yet. The Google-style rename (session 2) is **committed** as `568633b Changes with C++ style` |
 | Code style | Google C++ Style Guide: `lower_snake_case.cc/.h`, `desktop_os::` namespace, `.clang-format` in repo root (see docs/ARCHITECTURE.md "Coding style") |
 | Blockers | None. Assignment PDF was not in the workspace, so requirements come from the prompt file. Someone must cross-check them against the PDF |
-| Next steps | Nathan: commit + push session 2, create `development` · Lorens: theme/widgets/system_controls · Kim: taskbar/file_explorer/settings · Byron: task_manager · Nathan: wire each `Render` call as modules arrive |
+| Next steps | Nathan: create `development` · Lorens: theme/widgets/system_controls (done, merged) · Kim: file_explorer + settings (taskbar done, session 4) · Byron: task_manager · Nathan: wire each `Render` call as modules arrive |
 
 | Feature | State |
 |---|---|
@@ -22,7 +22,7 @@ Read this first. The current snapshot stays at the top; the session log below is
 | Shared `AppState` | Implemented |
 | Theme / Widgets | Implemented (Lorens) on `feature/lorens-ui-framework`; Linux build PASS, smoke-tested with temp wiring; needs Nathan wiring (see session 3) |
 | Clock / PWR button | Implemented (Lorens) on `feature/lorens-ui-framework`. Smoke test PASS (app ran 8 s, no crash). PWR-click exit and cross-size readability: **NOT RUN** (button not yet wired in committed code). Shutdown path itself already verified via window close |
-| Taskbar | Not started (Kim) |
+| Taskbar | Implemented (Kim, `0ada3c0`); not yet wired in `application.cc`; click/visual checklist rows NOT RUN (see session 4) |
 | File Explorer / Settings | Not started (Kim) |
 | Task Manager | Not started (Byron) |
 
@@ -186,3 +186,34 @@ or: Visual Studio > File > Open > Folder > x64 Debug > Build All > DesktopOS.exe
 5. Reproduce: `cmake -S . -B out/build/nobara-debug -DCMAKE_BUILD_TYPE=Debug -DGLFW_BUILD_X11=OFF -DGLFW_BUILD_WAYLAND=ON && cmake --build out/build/nobara-debug --parallel && ./out/build/nobara-debug/DesktopOS` (on Nobara; needs the Wayland/X11 dev packages per README troubleshooting if X11 build is wanted).
 
 **Review fix (2026-10-10, same branch):** `DrawPower()` arc spanned 432 degrees (overlapping ring). Fixed to an open ring with a ~52-degree gap centered at the top plus the vertical line. Verified with a real screenshot: clock `21:36:41` + date next to a correct power symbol. Also sharpened the `theme::Apply` doc comment: the host must call it once at init AND whenever `theme_index` changes. `PROJECT_PLAN.md` status table (still TODO for M3) left for Nathan/integration to update alongside the other members' rows.
+
+### Session 4: 2026-10-10, Kim (via Pi on macOS)
+
+**Objective:** Kim's assignment part 1: requirements B1–B3 — the fixed bottom taskbar, built on Lorens's merged shared UI.
+
+**Work completed**
+- `include/ui/taskbar.h` + `src/ui/taskbar.cc`: `taskbar::Render(AppState&)` draws a borderless, non-movable, full-width bar exactly `kTaskbarHeight` (48 px) tall at the bottom with a semi-opaque dark background (plan §7). Three `widgets::IconButton` launchers (`kFolder`, `kSettings`, `kTaskManager`) set `state.show_file_explorer/show_settings/show_task_manager = true` when clicked — open only, never toggles closed (toggling is each app window's own X button).
+- Open indicator (plan §5): an 18×3 px accent-blue (#4A7BE0) bar centered under each button whose app window is visible, in addition to IconButton's `active` fill/outline.
+- Launch buttons are laid out from the left and skipped once they would reach `system_controls::kSystemControlsWidth` (260 px) from the right edge, per session 3's constraint.
+- Window flags: `NoDecoration | NoMove | NoResize | NoSavedSettings | NoBringToFrontOnFocus | NoFocusOnAppearing | NoNavFocus | NoScrollbar | NoScrollWithMouse`, so the bar never takes focus or jumps in front of Lorens's clock/PWR overlay, which renders right after this module.
+
+**Files created:** `include/ui/taskbar.h`, `src/ui/taskbar.cc` (commit `0ada3c0`). Nothing else modified: the test wiring in `application.cc` was temporary and byte-restored (`git diff --exit-code src/core/application.cc` → identical to HEAD).
+
+**Build and test results**
+- Environment: macOS (Apple silicon), clang, CLion-bundled CMake 3.x/Ninja, existing `cmake-build-debug` tree; ImGui v1.91.9b + GLFW 3.4 (Cocoa backend).
+- New file picked up automatically by the `src/*.cc` glob (CONFIGURE_DEPENDS re-ran CMake): build **PASS**, `taskbar.cc` compiled with **0 warnings** at `-Wall -Wextra`. The only build warnings are pre-existing macOS OpenGL deprecation notices (`glViewport`/`glClearColor`/`glClear`) in `application.cc` — environmental, not project-code regressions.
+- `clang++ -std=c++17 -fsyntax-only -Wall -Wextra` on `taskbar.cc`: **PASS**.
+- Runtime smoke with TEMPORARY local wiring (`taskbar::Render(state_);` after `desktop::Render`): app launched and ran 6 s with no crash; baseline run without wiring also OK. Wiring reverted before committing.
+- **NOT RUN:** actual clicks, visual layout/indicator inspection, and the Windows/MSVC build (screen capture is unavailable in this sandbox). The checklist rows "Taskbar visible, ≥3 buttons, opens each app" and "Close app ≠ close desktop; reopen" remain NOT RUN until someone verifies on a real display.
+
+**Decisions (please don't reverse without discussing)**
+- Clicking a launch button always sets its flag `true` (plan §5 wording); it does not close an open app.
+- The bar uses `NoBringToFrontOnFocus`, so the system_controls overlay (rendered next in frame order) always draws on top of the bar background.
+- The 18×3 indicator bar was added to satisfy plan §5's explicit "open indicator under each button" requirement; it is separate from IconButton's `active` state.
+- `PROJECT_PLAN.md` rows B1–B3 left as TODO until the visual/click checklist actually passes.
+
+**Next member handoff**
+1. **Nathan:** add `taskbar::Render(state_);` as the first integration point (right after `desktop::Render(state_);` in the commented block) when wiring modules.
+2. **Kim:** next = File Explorer (D1), then Settings (E1).
+3. **Anyone on Windows:** once wired, run the checklist rows for the taskbar and close-vs-reopen; macOS visual verification was not possible here.
+4. Review context: `docs/KIM_MCO4_PLAN_HANDOFF_REVIEW.md` (pushed as `c8facb4`, checkpoint updated in `33ec755`).
