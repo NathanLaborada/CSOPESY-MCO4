@@ -1,6 +1,6 @@
 # PROJECT_PLAN — CSOPESY MO4 Desktop-Style OS Mockup
 
-Last updated: 2026-10-09 (Nathan's core session).
+Last updated: 2026-10-10 (Kim: B1–B3 marked IN PROGRESS; original: Nathan's core session 2026-10-09).
 Status legend: **DONE** (implemented and verified) · **TODO** (not started) · **IN PROGRESS**.
 
 ## 1. Overview
@@ -18,9 +18,9 @@ This is a desktop-style operating system mockup written in C++17 with OpenGL, GL
 | A3 | Real-time clock showing system time | Lorens | TODO |
 | A4 | Clearly identifiable PWR button that closes the app gracefully | Lorens (button) / Nathan (shutdown path) | Shutdown path DONE, button TODO |
 | A5 | Resources cleaned up on shutdown | Nathan | DONE |
-| B1 | Fixed taskbar, top or bottom | Kim | TODO |
-| B2 | ≥3 working icon buttons: File Explorer, System Settings, Task Manager | Kim | TODO |
-| B3 | Taskbar remains visible while apps are open | Kim | TODO |
+| B1 | Fixed taskbar, top or bottom | Kim | IN PROGRESS |
+| B2 | ≥3 working icon buttons: File Explorer, System Settings, Task Manager | Kim | IN PROGRESS |
+| B3 | Taskbar remains visible while apps are open | Kim | IN PROGRESS |
 | C1 | Task Manager with Processes section and table | Byron | TODO |
 | C2 | Process name, CPU %, memory columns with dummy data | Byron | TODO |
 | D1 | File Explorer: title/nav area, placeholder listing, content area, icons, selection | Kim | TODO |
@@ -100,7 +100,7 @@ Defined in `include/core/app_state.h`. Documented in `docs/ARCHITECTURE.md` (sec
 | M1 Foundation | CMake, deps, GLFW/GL/ImGui init, loop, shutdown | DONE 2026-10-09 |
 | M2 Desktop | Wallpaper, shared state, docs | DONE 2026-10-09 |
 | M3 Shared UI | Theme, Widgets, clock, PWR (Lorens) | TODO |
-| M4 Taskbar + apps | Taskbar, File Explorer, Settings (Kim) | TODO |
+| M4 Taskbar + apps | Taskbar, File Explorer, Settings (Kim) | IN PROGRESS (taskbar coded `0ada3c0`; apps pending) |
 | M5 Task Manager | Process data + table (Byron) | TODO |
 | M6 Integration | All `Render` calls wired; full test checklist | TODO |
 | M7 Docs + PPT | Final README/handoff/PPT guide refresh, screenshots | TODO |

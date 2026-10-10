@@ -1,6 +1,6 @@
 # Architecture — CSOPESY MO4 Desktop OS Mockup
 
-Status legend: **[DONE]** implemented and verified · **[PLANNED]** interface agreed, not yet implemented.
+Status legend: **[DONE]** implemented and verified · **[IMPLEMENTED]** code merged, not yet wired or verified · **[PLANNED]** interface agreed, not yet implemented.
 
 ## Layers
 
@@ -9,18 +9,21 @@ main.cc
   └── Application (core)                 owns window, GL context, ImGui, loop, shutdown
         ├── AppState state_              the ONE shared state instance
         └── RenderFrame() each frame, in this order:
-              1. desktop::Render(state)        [DONE]    Nathan  wallpaper (background draw list)
-              2. taskbar::Render(state)        [PLANNED] Kim     bottom bar, launches apps
-              3. system_controls::Render(state) [PLANNED] Lorens  clock + PWR button
-              4. file_explorer::Render(state)   [PLANNED] Kim
-              5. settings::Render(state)       [PLANNED] Kim
-              6. task_manager::Render(state)    [PLANNED] Byron
+              1. desktop::Render(state)          [DONE]        Nathan  wallpaper (background draw list)
+              2. taskbar::Render(state)          [IMPLEMENTED] Kim     bottom bar, launches apps
+              3. system_controls::Render(state)  [IMPLEMENTED] Lorens  clock + PWR button
+              4. file_explorer::Render(state)    [PLANNED]     Kim
+              5. settings::Render(state)         [PLANNED]     Kim
+              6. task_manager::Render(state)     [PLANNED]     Byron
+
+[IMPLEMENTED] modules compile and are merged to `main` but are not yet
+called by `Application::RenderFrame()`; only Nathan wires them in.
 ```
 
 Supporting shared UI (no per-frame call from Application unless Lorens needs one):
 
-- `Theme` [PLANNED] (Lorens): colors and style. Applied once in `Application::Init()` and re-applied when `theme_index` changes.
-- `Widgets` [PLANNED] (Lorens): reusable icon buttons, panels and labels used by every module.
+- `Theme` [IMPLEMENTED] (Lorens): colors and style. Applied once in `Application::Init()` and re-applied when `theme_index` changes.
+- `Widgets` [IMPLEMENTED] (Lorens): reusable icon buttons, panels and labels used by every module.
 
 ## Graphics stack
 

@@ -172,6 +172,11 @@ Dependency-aware, limited to my responsibilities:
 
 ## 12. Progress Checkpoint and Resume Instructions
 
+> **Historical snapshot.** This review was written 2026-10-10 before the
+> taskbar landed. For current state read `SESSION_HANDOFF.md` (append-only;
+> taskbar delivered in `0ada3c0`, session 4 entry). The lines below record
+> the review's own checkpoint at completion time.
+
 * **Current review status:** **COMPLETE.** All 7 phases done; this file contains the final findings.
 * **Completed review steps:** baseline captured → checkpoint created → plan read → handoff read → responsibilities extracted (§6) → plan/handoff/repo cross-check (§7) → independent verification (§8) → QA pass.
 * **Remaining review steps:** none. Remaining **project** work is §10 (implementation), which belongs to me in a future session, not to this review.

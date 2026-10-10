@@ -2,11 +2,11 @@
 
 Read this first. The current snapshot stays at the top; the session log below is append-only (newest last).
 
-## Current project status (updated 2026-10-09)
+## Current project status (updated 2026-10-10)
 
 | Item | Status |
 |---|---|
-| Stage | M1 Foundation + M2 Desktop **done**; M3 Shared UI (Lorens) **implemented on feature branch**, awaiting integration; Kim/Byron can start in parallel |
+| Stage | M1 Foundation + M2 Desktop **done**; M3 Shared UI (Lorens) **merged to `main`** (PR #1, `b7109d5`) but **not yet wired** in `application.cc`; taskbar **implemented** (Kim, `0ada3c0`), not yet wired; File Explorer / Settings / Task Manager not started; Kim/Byron working in parallel |
 | Last milestone | Nathan's core: CMake, GLFW/OpenGL 3.3/ImGui init, loop, shutdown, wallpaper, `AppState` |
 | Build | **PASS**: `x64-debug` and `x64-release` configure + build, 0 errors, 0 warnings in project code (`/W4`), VS Community 2026 18.10 / MSVC 14.51 / CMake 4.3.1 |
 | Tests | Launch, wallpaper, resize, window-close exit (code 0), idle CPU: **PASS**. Theme/widgets/system_controls compile + launch smoke test: **PASS** (Linux, temp wiring). PWR-click shutdown, taskbar, apps: **NOT RUN** (see session 3) |
@@ -33,13 +33,13 @@ Read this first. The current snapshot stays at the top; the session log below is
 | App launches | PASS | Debug + Release launched by script |
 | Desktop fills client area | PASS | Screenshot at 1280x720 and 1700x950 |
 | Wallpaper visible | PASS | Screenshots of Midnight, Aurora, Slate (index temporarily changed for test, then reverted) |
-| Clock shows current time / updates | NOT RUN | not implemented |
+| Clock shows current time / updates | NOT RUN | implemented on `main` (session 3), not wired |
 | Resizing doesn't break desktop | PASS | Window resized to 1700x950 via MoveWindow; wallpaper + watermark followed |
-| PWR exits cleanly | NOT RUN | button not implemented; same exit path verified via window close |
+| PWR exits cleanly | NOT RUN | implemented on `main` (session 3), not wired; same exit path verified via window close |
 | Window close exits cleanly | PASS | `CloseMainWindow()` → exit code 0 in ~100 ms, Debug and Release |
 | Idle CPU reasonable | PASS | ~0–5% of one core (was ~107% before throttling fix) |
-| Taskbar visible, ≥3 buttons, opens each app | NOT RUN | not implemented |
-| Close app ≠ close desktop; reopen | NOT RUN | not implemented |
+| Taskbar visible, ≥3 buttons, opens each app | NOT RUN | implemented `0ada3c0`, not wired; needs a real display (see session 4) |
+| Close app ≠ close desktop; reopen | NOT RUN | File Explorer / Settings / Task Manager not implemented; taskbar flag logic pending wiring |
 | Task Manager table / names / CPU / memory | NOT RUN | not implemented |
 | CMake configure succeeds | PASS | `cmake --preset x64-debug` / `x64-release` |
 | Compiles without unresolved symbols | PASS | |
