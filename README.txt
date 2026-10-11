@@ -21,7 +21,14 @@ GROUP MEMBERS AND MODULE OWNERSHIP
             Files: src/ui/theme.*, src/ui/widgets.*, src/ui/system_controls.*
   (.h files live under include/ with the same sub-folder.)
 
-Current status per module: see SESSION_HANDOFF.md (top section).
+CURRENT STATUS (2026-10-11)
+---------------------------
+All modules are integrated: desktop, taskbar, clock + PWR, File Explorer,
+Settings (wallpaper + theme pickers) and Task Manager are drawn every frame
+by Application::RenderFrame(). Debug and Release build with 0 warnings and
+the full acceptance checklist passed on Windows/MSVC (integration branch
+feature/nathan-integration, pending merge into development).
+Details per module and test results: SESSION_HANDOFF.md (top section).
 
 REQUIRED TECHNOLOGIES
 ---------------------
@@ -75,6 +82,8 @@ Open "Developer PowerShell for VS 2026" (Start menu), cd to the project, then:
   .\out\build\x64-debug\DesktopOS.exe
 Use x64-release instead of x64-debug for an optimized build. A normal
 PowerShell window will NOT work, because it doesn't have cl.exe and ninja on PATH.
+From any shell you can instead load the environment first, e.g.:
+  "C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat" -arch=x64
 
 Build output goes to out\build\<preset>\ (ignored by git).
 
@@ -124,8 +133,15 @@ TROUBLESHOOTING
   Window does not open, console says "could not create window with OpenGL 3.3"
       Update the graphics driver. Remote Desktop / VMs without GPU
       acceleration may not support OpenGL 3.3.
+  Clock/PWR invisible or PWR does nothing
+      system_controls::Render must run BEFORE taskbar::Render in
+      Application::RenderFrame() (see docs\ARCHITECTURE.md, render order).
+  A Selectable row only shows its first letter / cannot be clicked
+      Pass width 0.0f, not -1.0f, to ImGui::Selectable.
+  Text shows "?" instead of a character
+      The default font lacks that glyph (e.g. an em dash). Use plain ASCII.
   High CPU usage
-      Should be ~0-5% when idle. If a module adds a busy loop or
+      Should be ~0-7% of one core when idle (measured 3-7%). If a module adds a busy loop or
       sleeps, remove it; the main loop already throttles itself.
 
 PROJECT DIRECTORY OVERVIEW
@@ -146,8 +162,9 @@ GIT / GITHUB
 ------------
 Repository: https://github.com/NathanLaborada/CSOPESY-MCO4
   git clone https://github.com/NathanLaborada/CSOPESY-MCO4.git
-If the development branch does not exist yet, Nathan creates it once:
-  git switch -c development && git push -u origin development
+The development branch was created from main on 2026-10-11 (session 8).
+If it is missing on the remote, push it once:
+  git push -u origin development
 
 Branches: main (stable, demo-ready), development (integration), and one
 feature branch per member:

@@ -97,7 +97,7 @@ void DrawPersonalizationCategory(AppState& state) {
 void DrawAboutCategory() {
   ImGui::TextUnformatted("CSOPESY Desktop OS Mockup");
   ImGui::Spacing();
-  InfoRow("Course project", "CSOPESY MCO4 — desktop-style GUI");
+  InfoRow("Course project", "CSOPESY MCO4 - desktop-style GUI");
   InfoRow("Built with", "C++17, OpenGL 3.3, GLFW, Dear ImGui");
   InfoRow("Nature", "Graphical simulation only, not a real OS");
   InfoRow("Data", "All process and system data is dummy data");
@@ -131,7 +131,7 @@ void DrawCategoryList() {
   for (int i = 0; i < kCategoryCount; ++i) {
     if (i > 0) ImGui::Spacing();
     if (ImGui::Selectable(kCategories[i], g_category == i, 0,
-                          ImVec2(-1.0f, kCategoryHeight))) {
+                          ImVec2(0.0f, kCategoryHeight))) {
       g_category = i;
     }
   }

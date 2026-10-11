@@ -1,6 +1,6 @@
 # PROJECT_PLAN — CSOPESY MO4 Desktop-Style OS Mockup
 
-Last updated: 2026-10-10 (Kim: B1–B3/D1/E1 statuses; M3/A3/A4/V1 reconciled to IN PROGRESS — merged in PR #1 but not wired/verified; confirm with Nathan/Lorens).
+Last updated: 2026-10-11 (Nathan, session 8: all modules wired into `Application`, theme integrated, acceptance checklist run on Windows/MSVC — statuses below reflect PASS results in `SESSION_HANDOFF.md`).
 Status legend: **DONE** (implemented and verified) · **TODO** (not started) · **IN PROGRESS**.
 
 ## 1. Overview
@@ -15,22 +15,22 @@ This is a desktop-style operating system mockup written in C++17 with OpenGL, GL
 |---|---|---|---|
 | A1 | Desktop background fills the client area | Nathan | DONE |
 | A2 | Wallpaper (gradient / drawn pattern) | Nathan | DONE (3 wallpapers) |
-| A3 | Real-time clock showing system time | Lorens | IN PROGRESS (merged PR #1; not wired, not verified) |
-| A4 | Clearly identifiable PWR button that closes the app gracefully | Lorens (button) / Nathan (shutdown path) | Shutdown path DONE; button IN PROGRESS (merged; not wired, not verified) |
+| A3 | Real-time clock showing system time | Lorens | DONE (wired + verified 2026-10-11) |
+| A4 | Clearly identifiable PWR button that closes the app gracefully | Lorens (button) / Nathan (shutdown path) | DONE (PWR exits Debug + Release; needed render-order fix, session 8) |
 | A5 | Resources cleaned up on shutdown | Nathan | DONE |
-| B1 | Fixed taskbar, top or bottom | Kim | IN PROGRESS |
-| B2 | ≥3 working icon buttons: File Explorer, System Settings, Task Manager | Kim | IN PROGRESS |
-| B3 | Taskbar remains visible while apps are open | Kim | IN PROGRESS |
-| C1 | Task Manager with Processes section and table | Byron | TODO |
-| C2 | Process name, CPU %, memory columns with dummy data | Byron | TODO |
-| D1 | File Explorer: title/nav area, placeholder listing, content area, icons, selection | Kim | IN PROGRESS |
-| E1 | System Settings: title/nav, categories, placeholder info, demo controls | Kim | IN PROGRESS |
-| V1 | Consistent dark theme, hover/active states, usable when resized | Lorens (theme) / all | Resizing of desktop DONE; theme IN PROGRESS (merged; not wired, not verified) |
+| B1 | Fixed taskbar, top or bottom | Kim | DONE (bottom, 48 px, verified) |
+| B2 | ≥3 working icon buttons: File Explorer, System Settings, Task Manager | Kim | DONE (verified) |
+| B3 | Taskbar remains visible while apps are open | Kim | DONE (verified with all three apps open and after resize) |
+| C1 | Task Manager with Processes section and table | Byron | DONE (`fa5a6da`, verified) |
+| C2 | Process name, CPU %, memory columns with dummy data | Byron | DONE (verified; labelled simulated) |
+| D1 | File Explorer: title/nav area, placeholder listing, content area, icons, selection | Kim | DONE (verified after session-8 hit-box fix) |
+| E1 | System Settings: title/nav, categories, placeholder info, demo controls | Kim | DONE (verified after session-8 hit-box fix) |
+| V1 | Consistent dark theme, hover/active states, usable when resized | Lorens (theme) / all | DONE (theme applied at startup; resize verified) |
 
 **Optional enhancements** (only after all of the above):
-- Wallpaper picker in Settings (`wallpaper_index` already supported by Desktop).
-- Theme switcher (`theme_index`).
-- Task Manager sorting.
+- Wallpaper picker in Settings: DONE (Kim, verified).
+- Theme switcher (`theme_index`): DONE (Kim picker + Nathan re-apply, verified).
+- Task Manager sorting: not implemented.
 
 ## 3. Architecture
 
@@ -44,18 +44,17 @@ MCO4/
 ├── CMakePresets.json       x64-debug / x64-release (Ninja + MSVC)
 ├── .gitignore
 ├── README.txt  PROJECT_PLAN.md  PPT_README.md  SESSION_HANDOFF.md
-├── docs/ARCHITECTURE.md
+├── docs/{ARCHITECTURE.md, NATHAN_NEXTPLAN.md, KIM_MCO4_PLAN_HANDOFF_REVIEW.md}
 ├── include/core/{application.h, app_state.h}
 ├── include/ui/{desktop,taskbar,theme,widgets,system_controls}.h
-├── include/apps/{file_explorer,settings}.h
+├── include/apps/{file_explorer,settings,task_manager}.h
 ├── src/main.cc
 ├── src/core/application.cc
 ├── src/ui/{desktop,taskbar,theme,widgets,system_controls}.cc
-└── src/apps/{file_explorer,settings}.cc
+└── src/apps/{file_explorer,settings,task_manager}.cc
 ```
 
-Files still to be added (CMake picks up new `src/**/*.cc` automatically):
-`include/apps/task_manager.h` + `src/apps/task_manager.cc` (Byron).
+All planned modules exist. CMake picks up new `src/**/*.cc` automatically.
 
 ## 5. Member responsibilities
 
@@ -66,7 +65,8 @@ Files still to be added (CMake picks up new `src/**/*.cc` automatically):
 - Init error handling with partial cleanup; ordered shutdown: **DONE**
 - Desktop wallpaper (3 styles) and watermark: **DONE**
 - Shared `AppState` interface and module contract: **DONE**
-- Integration of other members' `Render` calls into `Application::RenderFrame`: **TODO**, as each module lands
+- Integration of other members' `Render` calls into `Application::RenderFrame`: **DONE** (session 8)
+- Theme applied at startup and re-applied when `theme_index` changes: **DONE** (session 8)
 
 ### Kim: taskbar and app screens
 - `Taskbar`: fixed bottom bar, exactly `kTaskbarHeight` tall, full width, ≥3 icon buttons that set `show_file_explorer` / `show_settings` / `show_task_manager` to true. Show an "open" indicator under each button whose app is visible.
@@ -101,11 +101,11 @@ Defined in `include/core/app_state.h`. Documented in `docs/ARCHITECTURE.md` (sec
 |---|---|---|
 | M1 Foundation | CMake, deps, GLFW/GL/ImGui init, loop, shutdown | DONE 2026-10-09 |
 | M2 Desktop | Wallpaper, shared state, docs | DONE 2026-10-09 |
-| M3 Shared UI | Theme, Widgets, clock, PWR (Lorens) | IN PROGRESS (merged in PR #1 `b7109d5`; awaiting wiring + verification) |
-| M4 Taskbar + apps | Taskbar, File Explorer, Settings (Kim) | IN PROGRESS (`0ada3c0`, `bdca7d1`, `caf5e7c` coded; acceptance tests pending) |
-| M5 Task Manager | Process data + table (Byron) | TODO |
-| M6 Integration | All `Render` calls wired; full test checklist | TODO |
-| M7 Docs + PPT | Final README/handoff/PPT guide refresh, screenshots | TODO |
+| M3 Shared UI | Theme, Widgets, clock, PWR (Lorens) | DONE 2026-10-11 (wired + verified) |
+| M4 Taskbar + apps | Taskbar, File Explorer, Settings (Kim) | DONE 2026-10-11 (wired + verified, small hit-box fixes) |
+| M5 Task Manager | Process data + table (Byron) | DONE 2026-10-11 (`fa5a6da`, wired + verified) |
+| M6 Integration | All `Render` calls wired; full test checklist | DONE 2026-10-11 on `feature/nathan-integration`; merge to `development` pending review |
+| M7 Docs + PPT | Final README/handoff/PPT guide refresh, screenshots | IN PROGRESS (docs refreshed in session 8; final screenshots + slides by the group) |
 
 M3–M5 can run in parallel; each depends only on M1/M2. Kim's taskbar buttons should use Lorens's `widgets::IconButton` once it exists. Until then a plain `ImGui::Button` is fine and can be swapped later.
 
@@ -113,7 +113,7 @@ M3–M5 can run in parallel; each depends only on M1/M2. Kim's taskbar buttons s
 
 1. Each member works on their own branch and their own files only.
 2. When a module compiles and works on its own (temporarily calling it locally is fine), open a PR to `development`.
-3. Nathan adds the single `<module>::Render(state_);` line in `Application::RenderFrame()` (the comment block lists the order) during review.
+3. Nathan adds the single `<module>::Render(state_);` line in `Application::RenderFrame()` during review. Current order: desktop, system_controls, taskbar, file_explorer, settings, task_manager (system_controls before taskbar is deliberate, see docs/ARCHITECTURE.md).
 4. After each merge, everyone pulls `development`, rebuilds, and runs the test checklist below.
 5. `development` → `main` only when the full checklist passes.
 
@@ -133,7 +133,10 @@ Use the checklist in `SESSION_HANDOFF.md` ("Test checklist"). Mark each test PAS
 
 ## 12. Definition of done
 
-- Every requirement in section 2 is marked DONE with a test result of PASS.
-- Clean configure + build of `x64-debug` and `x64-release` with no errors.
-- PWR and the window close button both exit with code 0.
-- Documentation matches the code. `SESSION_HANDOFF.md` is current.
+- [x] Every requirement in section 2 is marked DONE with a test result of PASS (2026-10-11).
+- [x] Clean configure + build of `x64-debug` and `x64-release` with no errors (0 warnings).
+- [x] PWR and the window close button both exit with code 0 (Release verified; Debug PWR exit verified).
+- [x] Documentation matches the code. `SESSION_HANDOFF.md` is current.
+- [ ] Integration branch reviewed and merged into `development`, then `main`.
+- [ ] Requirements cross-checked against the assignment PDF.
+- [ ] VS IDE "Open Folder" + F5 confirmed by a member.
