@@ -2,7 +2,7 @@
 
 This guide lists **what to put in the technical presentation and where to get it**. It is not the presentation itself; no slides have been created.
 
-> As of 2026-10-11 every module is implemented, wired into `Application::RenderFrame()` and verified on Windows/MSVC (see `SESSION_HANDOFF.md`, session 8). All slides can now be filled. Take every screenshot from the final integrated build (after `feature/nathan-integration` is merged), not from older branches.
+> As of 2026-10-11 (session 9) every module is implemented, wired and verified on Windows/MSVC, and the code is final. The screenshots for section 4 are in `docs/screenshots/`, taken from the final Release build. The PDF requires these PPT parts: Cover, Video Walkthrough, Architectural Diagram, Code Snippets, and a written discussion of the design.
 
 ## 1. What the presentation must communicate
 
@@ -17,24 +17,25 @@ This guide lists **what to put in the technical presentation and where to get it
 | # | Title | Purpose / content | Evidence to capture | Supplied by | Source files |
 |---|---|---|---|---|---|
 | 1 | Cover | Course (CSOPESY), MO4 title, group members | — | anyone | — |
-| 2 | Project Overview | What is simulated; list of required features; "simulated data" disclaimer | Full-desktop screenshot | Nathan | PROJECT_PLAN.md §2 |
-| 3 | Technologies & Environment | C++17, VS Community 2026, CMake + presets, GLFW 3.4, OpenGL 3.3 core, Dear ImGui v1.91.9b, Git/GitHub | VS screenshot with CMake preset dropdown | Nathan | CMakeLists.txt, CMakePresets.json |
-| 4 | System Architecture | Layer diagram (see §4) and who owns what | Diagram | Nathan | docs/ARCHITECTURE.md |
-| 5 | GLFW / OpenGL / ImGui Initialization | 10-step init order, error handling, shutdown order | Snippet A | Nathan | src/core/application.cc `Init()` |
-| 6 | Render Loop & Integration | Event wait → theme check → NewFrame → desktop, clock/PWR, taskbar, apps → Render → swap; idle throttling (107% → ~3–7% CPU); why clock/PWR renders before the taskbar | Snippet B | Nathan | application.cc `Run()`, `RenderFrame()` |
-| 7 | Desktop & Wallpaper | Background draw list, gradients, radial glow triangle fan, 3 wallpapers, resize behavior | Screenshots of all 3 wallpapers; one resized | Nathan | src/ui/desktop.cc |
-| 8 | Theme, Clock & PWR | Shared style, real-time clock source, PWR → graceful shutdown | Close-up of clock + PWR; Snippet G | Lorens | theme.cc, system_controls.cc |
-| 9 | Taskbar & App Launching | Icon buttons → `show_*` flags; reopen; no duplicates | Taskbar close-up, hover state | Kim | taskbar.cc, app_state.h |
-| 10 | File Explorer | Layout (nav, listing, content), drawn icons, selection | Screenshot with a selected item | Kim | file_explorer.cc |
-| 11 | System Settings | Categories, placeholder info, working demo controls (wallpaper/theme) | Before/after of a setting change | Kim | settings.cc |
-| 12 | Task Manager | Processes table, CPU/Memory columns, how dummy values are generated | Screenshot of table | Byron | task_manager.cc |
-| 13 | Shared State & Lifecycle | `AppState` fields, who writes/reads, open/close/reopen flow | Snippet C | Nathan | app_state.h |
-| 14 | Testing & Demo Results | Test checklist with PASS/FAIL | Table from SESSION_HANDOFF.md | all | SESSION_HANDOFF.md |
-| 15 | Member Contributions | One row per member: modules, key decisions | — | each member | PROJECT_PLAN.md §5 |
-| 16 | Challenges | Intel driver ignoring vsync → CPU spin (`glfwWaitEventsTimeout`); glow banding (vertex-color fan); integration: taskbar hid clock/PWR (ImGui `NoBringToFrontOnFocus` stacking → render order swap); `Selectable` width `-1` gave zero-width rows; em dash rendered as `?`; File Explorer null-path crash (Kim) | — | all | SESSION_HANDOFF.md sessions 1, 5, 8 |
-| 17 | Conclusion | What works, what we learned | — | anyone | — |
+| 2 | Video Walkthrough | **Required by the PDF.** One uncut MP4 (480p-720p, max 1 GB) **embedded in the PPTX**, starting with pressing Run/Debug in Visual Studio | The recording itself | group | PDF "Submission Details" |
+| 3 | Project Overview | What is simulated; list of required features; "simulated data" disclaimer | Full-desktop screenshot | Nathan | PROJECT_PLAN.md §2 |
+| 4 | Technologies & Environment | C++17, VS Community 2026, CMake + presets, GLFW 3.4, OpenGL 3.3 core, Dear ImGui v1.91.9b, Git/GitHub | VS screenshot with CMake preset dropdown | Nathan | CMakeLists.txt, CMakePresets.json |
+| 5 | System Architecture | Layer diagram (see §4) and who owns what | Diagram | Nathan | docs/ARCHITECTURE.md |
+| 6 | GLFW / OpenGL / ImGui Initialization | 10-step init order, error handling, shutdown order | Snippet A | Nathan | src/core/application.cc `Init()` |
+| 7 | Render Loop & Integration | Event wait → theme check → NewFrame → desktop, clock/PWR, taskbar, apps → Render → swap; idle throttling (107% → ~3–7% CPU); why clock/PWR renders before the taskbar | Snippet B | Nathan | application.cc `Run()`, `RenderFrame()` |
+| 8 | Desktop & Wallpaper | Background draw list, gradients, radial glow triangle fan, 3 wallpapers, resize behavior | Screenshots of all 3 wallpapers; one resized | Nathan | src/ui/desktop.cc |
+| 9 | Theme, Clock & PWR | Shared style, real-time clock source, PWR → graceful shutdown | Close-up of clock + PWR; Snippet G | Lorens | theme.cc, system_controls.cc |
+| 10 | Taskbar & App Launching | Icon buttons → `show_*` flags; reopen; no duplicates | Taskbar close-up, hover state | Kim | taskbar.cc, app_state.h |
+| 11 | File Explorer | Layout (nav, listing, content), drawn icons, selection | Screenshot with a selected item | Kim | file_explorer.cc |
+| 12 | System Settings | Categories, placeholder info, working demo controls (wallpaper/theme) | Before/after of a setting change | Kim | settings.cc |
+| 13 | Task Manager | Processes table, CPU/Memory columns, how dummy values are generated | Screenshot of table | Byron | task_manager.cc |
+| 14 | Shared State & Lifecycle | `AppState` fields, who writes/reads, open/close/reopen flow | Snippet C | Nathan | app_state.h |
+| 15 | Testing & Demo Results | Test checklist with PASS/FAIL | Table from SESSION_HANDOFF.md | all | SESSION_HANDOFF.md |
+| 16 | Member Contributions | One row per member: modules, key decisions | — | each member | PROJECT_PLAN.md §5 |
+| 17 | Challenges | Intel driver ignoring vsync → CPU spin (`glfwWaitEventsTimeout`); glow banding (vertex-color fan); integration: taskbar hid clock/PWR (ImGui `NoBringToFrontOnFocus` stacking → render order swap); `Selectable` width `-1` gave zero-width rows; em dash rendered as `?`; File Explorer null-path crash (Kim) | — | all | SESSION_HANDOFF.md sessions 1, 5, 8 |
+| 18 | Conclusion | What works, what we learned | — | anyone | — |
 
-Merge slides 5–6 or 10–11 if a shorter deck is needed.
+Merge slides 6–7 or 11–12 if a shorter deck is needed.
 
 ## 3. Code snippets to include
 
@@ -56,18 +57,18 @@ Keep each snippet to ≤15 lines and cut irrelevant lines.
 
 Capture all of these from the final Release build at the default 1280x720 window size.
 
-| Screenshot | How to get it | Responsible |
-|---|---|---|
-| Full desktop with taskbar, nothing open | Launch, don't click anything | Nathan |
-| Each wallpaper (Midnight, Aurora, Slate) | Settings → Personalization → Wallpaper | Nathan |
-| Theme Midnight vs Slate (same window) | Settings → Personalization → Theme, before/after | Lorens |
-| Taskbar close-up with hover + open indicators | Open 1–2 apps, hover a launcher | Kim |
-| File Explorer with a selected item and a deep breadcrumb | Sidebar → Downloads, click a file | Kim |
-| System Settings, all four categories (or one before/after) | Click each category | Kim |
-| Task Manager, Processes table with totals + "Simulated" banner | Taskbar → Task Manager | Byron |
-| Clock + PWR close-up | Crop the taskbar's right end | Lorens |
-| All three apps open at once (no duplicates, taskbar still visible) | Click all three launchers | anyone |
-| Resized small window (UI re-clamps above taskbar) | Drag the window to ~900x560 | Nathan |
+| Screenshot | How to get it | Responsible | File in `docs/screenshots/` |
+|---|---|---|---|
+| Full desktop with taskbar, nothing open | Launch, don't click anything | Nathan | `01_desktop.png` |
+| Each wallpaper (Midnight, Aurora, Slate) | Settings → Personalization → Wallpaper | Nathan | `02a_wallpaper_midnight.png`, `02b_wallpaper_aurora.png`, `02c_wallpaper_slate.png` |
+| Theme Midnight vs Slate (same window) | Settings → Personalization → Theme, before/after | Lorens | `03a_theme_midnight.png`, `03b_theme_slate.png` |
+| Taskbar close-up with hover + open indicators | Open 1–2 apps, hover a launcher | Kim | `04c_taskbar_closeup.png` (crop), full: `04a_taskbar_hover_midnight.png`, `04b_taskbar_hover_slate.png` |
+| File Explorer with a selected item and a deep breadcrumb | Sidebar → Downloads, click a file | Kim | `05_file_explorer_downloads.png` |
+| System Settings, all four categories (or one before/after) | Click each category | Kim | `06a_settings_system.png` … `06d_settings_personalization.png` |
+| Task Manager, Processes table with totals + "Simulated" banner | Taskbar → Task Manager | Byron | `07_task_manager.png` |
+| Clock + PWR close-up | Crop the taskbar's right end | Lorens | `08c_clock_pwr_closeup.png` (crop), PWR red hover: `08a_pwr_hover_midnight.png`, `08b_pwr_hover_slate.png` |
+| All three apps open at once (no duplicates, taskbar still visible) | Click all three launchers | anyone | `09_all_three_open.png` |
+| Resized small window (UI re-clamps above taskbar) | Drag the window to ~900x560 | Nathan | `10_resized_small.png` (874x500 client) |
 
 **Architecture diagram:** draw the "Layers" tree from `docs/ARCHITECTURE.md` as boxes: `main.cc` → `Application` → shared `AppState` → six module boxes labeled with owner names, in the real render order (desktop, clock/PWR, taskbar, apps). Add arrows: Taskbar → `show_*` flags; app X → `show_*` false; PWR → `shutdown_requested` → `Application::Run` exit; Settings → `wallpaper_index` → Desktop; Settings → `theme_index` → Application → `theme::Apply`.
 
@@ -86,12 +87,12 @@ Capture all of these from the final Release build at the default 1280x720 window
 
 | Member | Presents | Slides |
 |---|---|---|
-| Nathan | Core architecture, graphics stack, loop, shared state, desktop | 3–7, 13 |
-| Kim | Taskbar, File Explorer, System Settings | 9–11 |
-| Byron | Task Manager, dummy data design, testing results | 12, 14 |
-| Lorens | Theme, widgets, clock, PWR, UI consistency | 8, 16 |
+| Nathan | Core architecture, graphics stack, loop, shared state, desktop | 4–8, 14 |
+| Kim | Taskbar, File Explorer, System Settings | 10–12 |
+| Byron | Task Manager, dummy data design, testing results | 13, 15 |
+| Lorens | Theme, widgets, clock, PWR, UI consistency | 9, 17 |
 
-Everyone contributes their row to slide 15.
+Everyone contributes their row to slide 16. Since session 9 Nathan finished Kim's and Lorens's polish (formatting, tooltips), but the modules stay credited to Kim and Lorens.
 
 ## 7. Accuracy checklist (before finalizing the deck)
 
@@ -105,4 +106,9 @@ Everyone contributes their row to slide 15.
 
 ## 8. Group-Handled Deliverables
 
-The assignment PDF was not available to Claude, so it is unknown whether a video walkthrough or embedded MP4 is required. **Whoever has the PDF must check this.** If a video is required, the group records, edits and embeds it themselves. Claude did not and will not create any video.
+The PDF (`MO4 - Desktop_GUI.pdf`, checked in session 9) **requires a video**. The group records it; Claude did not and will not create any video. The rules:
+- One seamless, uncut recording, at least 480p and at most 720p, max 1 GB. The app's default 1280x720 window fits.
+- It must show pressing Run/Debug in the IDE, which starts the program. Don't touch the code while recording, and don't exit the program to change code.
+- Make the IDE font large enough to read on video.
+- Embed the MP4 directly in the PPTX (the file size should show it).
+- The quiz is a timed black-box test: per question you submit an MP4 that demonstrates the given test case. Keep a build that runs from the IDE ready; the PDF says not to recompile during the quiz.

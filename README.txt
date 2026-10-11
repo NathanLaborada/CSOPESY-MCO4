@@ -26,8 +26,10 @@ CURRENT STATUS (2026-10-11)
 All modules are integrated: desktop, taskbar, clock + PWR, File Explorer,
 Settings (wallpaper + theme pickers) and Task Manager are drawn every frame
 by Application::RenderFrame(). Debug and Release build with 0 warnings and
-the full acceptance checklist passed on Windows/MSVC (integration branch
-feature/nathan-integration, pending merge into development).
+the full acceptance checklist passed on Windows/MSVC. Requirements were
+cross-checked against the assignment PDF; all are met. Final screenshots
+for the presentation are in docs\screenshots\.
+Entry point (main function): src\main.cc
 Details per module and test results: SESSION_HANDOFF.md (top section).
 
 REQUIRED TECHNOLOGIES

@@ -18,6 +18,7 @@ constexpr float kIndicatorWidth = 18.0f;
 constexpr float kIndicatorHeight = 3.0f;
 constexpr float kIndicatorGap = 4.0f;
 constexpr float kIndicatorRadius = 1.5f;
+constexpr float kTooltipGap = 4.0f;
 
 // Single restrained blue accent, matching theme::Apply() (#4A7BE0).
 constexpr ImU32 kIndicatorColor = IM_COL32(74, 123, 224, 255);
@@ -27,16 +28,18 @@ const ImVec4 kBarBackground(0.06f, 0.07f, 0.12f, 0.92f);
 
 struct LaunchButton {
   const char* id;
+  const char* label;  // Hover tooltip.
   widgets::IconKind kind;
-  bool AppState::*show;
+  bool AppState::* show;
 };
 
 // Left-to-right order; all buttons sit left of the system_controls strip.
 constexpr LaunchButton kLaunchButtons[] = {
-    {"file_explorer", widgets::IconKind::kFolder,
+    {"file_explorer", "File Explorer", widgets::IconKind::kFolder,
      &AppState::show_file_explorer},
-    {"settings", widgets::IconKind::kSettings, &AppState::show_settings},
-    {"task_manager", widgets::IconKind::kTaskManager,
+    {"settings", "Settings", widgets::IconKind::kSettings,
+     &AppState::show_settings},
+    {"task_manager", "Task Manager", widgets::IconKind::kTaskManager,
      &AppState::show_task_manager},
 };
 
@@ -45,9 +48,9 @@ constexpr LaunchButton kLaunchButtons[] = {
 void Render(AppState& state) {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
   const ImVec2 bar_size(viewport->WorkSize.x, kTaskbarHeight);
-  const ImVec2 bar_pos(viewport->WorkPos.x, viewport->WorkPos.y +
-                                                viewport->WorkSize.y -
-                                                kTaskbarHeight);
+  const ImVec2 bar_pos(
+      viewport->WorkPos.x,
+      viewport->WorkPos.y + viewport->WorkSize.y - kTaskbarHeight);
 
   ImGui::SetNextWindowPos(bar_pos);
   ImGui::SetNextWindowSize(bar_size);
@@ -57,7 +60,9 @@ void Render(AppState& state) {
   ImGui::PushStyleColor(ImGuiCol_WindowBg, kBarBackground);
 
   // Not movable/resizable, never takes focus, never jumps in front of the
-  // system_controls overlay that renders right after this module.
+  // system_controls overlay. Application renders that overlay *before* this
+  // bar on purpose: ImGui puts a new NoBringToFrontOnFocus window at the
+  // back, so the window created last is drawn lowest.
   constexpr ImGuiWindowFlags kFlags =
       ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
       ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings |
@@ -79,6 +84,12 @@ void Render(AppState& state) {
                             ImVec2(kButtonSize, kButtonSize), open)) {
       state.*(button.show) = true;  // Clicking opens; it never toggles closed.
     }
+    if (ImGui::IsItemHovered()) {
+      // Above the bar, so it never covers the open indicators.
+      ImGui::SetNextWindowPos(ImVec2(button_pos.x, bar_pos.y - kTooltipGap),
+                              ImGuiCond_Always, ImVec2(0.0f, 1.0f));
+      ImGui::SetTooltip("%s", button.label);
+    }
     if (open) {
       // Open indicator centered under the button (requirements B1-B3).
       const float indicator_x =
@@ -86,8 +97,7 @@ void Render(AppState& state) {
       const float indicator_y = button_pos.y + kButtonSize + kIndicatorGap;
       ImGui::GetWindowDrawList()->AddRectFilled(
           ImVec2(indicator_x, indicator_y),
-          ImVec2(indicator_x + kIndicatorWidth,
-                 indicator_y + kIndicatorHeight),
+          ImVec2(indicator_x + kIndicatorWidth, indicator_y + kIndicatorHeight),
           kIndicatorColor, kIndicatorRadius);
     }
     x += kButtonSize + kButtonGap;

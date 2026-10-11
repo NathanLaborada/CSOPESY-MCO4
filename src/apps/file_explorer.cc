@@ -80,51 +80,47 @@ Entry BuildTree() {
           "Local Disk (C:)",
           {Folder("Program Files",
                   {Folder("Common Files",
-                          {File("license.rtf", "Rich Text Document",
-                                "18 KB")}),
+                          {File("license.rtf", "Rich Text Document", "18 KB")}),
                    File("opengl32.dll", "Application Extension", "1.2 MB")},
                   "10/07/2026 11:02 AM"),
-           Folder("Users",
-                  {Folder("kim",
-                          {Folder("Desktop",
-                                  {File("report.txt", "Text Document",
-                                        "12 KB", "10/10/2026 09:41 AM"),
-                                   File("wallpaper.png", "PNG File",
-                                        "2.4 MB", "10/09/2026 06:30 PM"),
-                                   Folder("Projects",
-                                          {Folder("CSOPESY-MCO4",
-                                                  {File("README.md",
-                                                        "Markdown File",
-                                                        "1 KB"),
-                                                   File("notes.txt",
-                                                        "Text Document",
-                                                        "3 KB")},
-                                                  "10/10/2026 08:15 AM")},
-                                          "10/10/2026 08:15 AM")},
-                                  "10/10/2026 09:41 AM"),
-                               Folder("Documents",
-                                      {File("timetable.xlsx",
-                                            "Microsoft Excel Worksheet",
-                                            "34 KB"),
-                                       File("agenda.txt", "Text Document",
-                                            "2 KB", "10/06/2026 04:20 PM"),
-                                       Folder("School", {})},
-                                      "10/08/2026 10:05 AM"),
-                               Folder("Downloads",
-                                      {File("imgui_v1.91.9b.zip",
-                                            "Compressed (zipped) Folder",
-                                            "4.8 MB"),
-                                       File("setup.exe", "Application",
-                                            "64 MB", "10/05/2026 07:55 PM")},
-                                      "10/09/2026 07:55 PM")},
-                          "10/10/2026 09:41 AM")},
-                  "10/10/2026 09:41 AM"),
-           Folder("Windows",
-                  {File("notepad.exe", "Application", "194 KB"),
-                   Folder("System32",
-                          {File("kernel32.dll", "Application Extension",
-                                "741 KB")})},
-                  "10/04/2026 01:12 PM")},
+           Folder(
+               "Users",
+               {Folder("kim",
+                       {Folder("Desktop",
+                               {File("report.txt", "Text Document", "12 KB",
+                                     "10/10/2026 09:41 AM"),
+                                File("wallpaper.png", "PNG File", "2.4 MB",
+                                     "10/09/2026 06:30 PM"),
+                                Folder("Projects",
+                                       {Folder("CSOPESY-MCO4",
+                                               {File("README.md",
+                                                     "Markdown File", "1 KB"),
+                                                File("notes.txt",
+                                                     "Text Document", "3 KB")},
+                                               "10/10/2026 08:15 AM")},
+                                       "10/10/2026 08:15 AM")},
+                               "10/10/2026 09:41 AM"),
+                        Folder("Documents",
+                               {File("timetable.xlsx",
+                                     "Microsoft Excel Worksheet", "34 KB"),
+                                File("agenda.txt", "Text Document", "2 KB",
+                                     "10/06/2026 04:20 PM"),
+                                Folder("School", {})},
+                               "10/08/2026 10:05 AM"),
+                        Folder("Downloads",
+                               {File("imgui_v1.91.9b.zip",
+                                     "Compressed (zipped) Folder", "4.8 MB"),
+                                File("setup.exe", "Application", "64 MB",
+                                     "10/05/2026 07:55 PM")},
+                               "10/09/2026 07:55 PM")},
+                       "10/10/2026 09:41 AM")},
+               "10/10/2026 09:41 AM"),
+           Folder(
+               "Windows",
+               {File("notepad.exe", "Application", "194 KB"),
+                Folder("System32", {File("kernel32.dll",
+                                         "Application Extension", "741 KB")})},
+               "10/04/2026 01:12 PM")},
           "10/10/2026 09:41 AM")},
       "10/10/2026 09:41 AM");
 }
@@ -145,9 +141,9 @@ const Entry* FindPath(const std::vector<std::string>& path) {
   const Entry* node = &Root();
   for (size_t i = 1; i < path.size(); ++i) {
     const std::string& segment = path[i];
-    const auto it = std::find_if(
-        node->children.begin(), node->children.end(),
-        [&segment](const Entry& e) { return e.name == segment; });
+    const auto it =
+        std::find_if(node->children.begin(), node->children.end(),
+                     [&segment](const Entry& e) { return e.name == segment; });
     if (it == node->children.end()) return nullptr;
     node = &*it;
   }
@@ -170,8 +166,8 @@ void DrawFileIcon(ImDrawList* draw_list, ImVec2 top_left, float size) {
   draw_list->PathFillConvex(kFileColor);
   const ImU32 edge = IM_COL32(40, 46, 66, 255);
   draw_list->AddLine(ImVec2(top_left.x + size - fold, top_left.y),
-                     ImVec2(top_left.x + size - fold, top_left.y + fold),
-                     edge, 1.0f);
+                     ImVec2(top_left.x + size - fold, top_left.y + fold), edge,
+                     1.0f);
   draw_list->AddLine(ImVec2(top_left.x + size - fold, top_left.y + fold),
                      ImVec2(top_left.x + size, top_left.y + fold), edge, 1.0f);
 }
@@ -220,16 +216,14 @@ void DrawPathBar() {
   for (size_t i = 0; i < g_path.size(); ++i) {
     if (i > 0) {
       ImGui::SameLine();
-      ImGui::PushStyleColor(ImGuiCol_Text,
-                            ImVec4(0.62f, 0.65f, 0.72f, 1.00f));
+      ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.62f, 0.65f, 0.72f, 1.00f));
       ImGui::TextUnformatted(">");
       ImGui::PopStyleColor();
       ImGui::SameLine();
     }
     if (ImGui::SmallButton(g_path[i].c_str())) {
       NavigateTo(std::vector<std::string>(
-          g_path.begin(),
-          g_path.begin() + static_cast<std::ptrdiff_t>(i) + 1));
+          g_path.begin(), g_path.begin() + static_cast<std::ptrdiff_t>(i) + 1));
     }
   }
   ImGui::EndChild();
@@ -247,8 +241,7 @@ void DrawSidebar() {
   SidebarItem("Documents", ChildPath(base, "Documents"));
   ImGui::Spacing();
   widgets::MutedText("This PC");
-  SidebarItem("Local Disk (C:)",
-              {"This PC", "Local Disk (C:)"});
+  SidebarItem("Local Disk (C:)", {"This PC", "Local Disk (C:)"});
   ImGui::EndChild();
 }
 
@@ -256,20 +249,17 @@ void DrawSidebar() {
 // double-clicking a folder navigates into it.
 void DrawListing(const Entry& node) {
   if (ImGui::BeginTable("##files", 4,
-                        ImGuiTableFlags_BordersInnerH |
-                            ImGuiTableFlags_RowBg |
+                        ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_RowBg |
                             ImGuiTableFlags_Resizable |
                             ImGuiTableFlags_ScrollY |
                             ImGuiTableFlags_SizingStretchProp,
                         ImVec2(0.0f, ImGui::GetContentRegionAvail().y))) {
     ImGui::TableSetupScrollFreeze(0, 1);
     ImGui::TableSetupColumn("Name");
-    ImGui::TableSetupColumn("Date modified",
-                            ImGuiTableColumnFlags_WidthFixed, 130.0f);
-    ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed,
-                            150.0f);
-    ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed,
-                            70.0f);
+    ImGui::TableSetupColumn("Date modified", ImGuiTableColumnFlags_WidthFixed,
+                            130.0f);
+    ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 150.0f);
+    ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, 70.0f);
     ImGui::TableHeadersRow();
 
     if (node.children.empty()) {
@@ -287,14 +277,13 @@ void DrawListing(const Entry& node) {
 
       // Invisible full-row target first; icon and label are drawn on top.
       ImGui::SetCursorScreenPos(cell);
-      const bool clicked = ImGui::Selectable(
-          ("##sel_" + entry.name).c_str(), selected,
-          ImGuiSelectableFlags_SpanAllColumns |
-              ImGuiSelectableFlags_AllowDoubleClick,
-          ImVec2(0.0f, kRowHeight));
+      const bool clicked =
+          ImGui::Selectable(("##sel_" + entry.name).c_str(), selected,
+                            ImGuiSelectableFlags_SpanAllColumns |
+                                ImGuiSelectableFlags_AllowDoubleClick,
+                            ImVec2(0.0f, kRowHeight));
 
-      ImGui::SetCursorScreenPos(
-          ImVec2(cell.x + 3.0f, cell.y + kIconPadY));
+      ImGui::SetCursorScreenPos(ImVec2(cell.x + 3.0f, cell.y + kIconPadY));
       DrawRowIcon(ImGui::GetWindowDrawList(), entry,
                   ImGui::GetCursorScreenPos());
 
@@ -352,8 +341,8 @@ void Render(AppState& state) {
                           ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSize(ImVec2(kDefaultWidth, kDefaultHeight),
                            ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSizeConstraints(
-      ImVec2(kMinWidth, kMinHeight), ImVec2(FLT_MAX, FLT_MAX));
+  ImGui::SetNextWindowSizeConstraints(ImVec2(kMinWidth, kMinHeight),
+                                      ImVec2(FLT_MAX, FLT_MAX));
 
   const bool visible = ImGui::Begin(kWindowTitle, &state.show_file_explorer);
   ClampAboveTaskbar();

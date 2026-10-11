@@ -6,14 +6,14 @@ Read this first. The current snapshot stays at the top; the session log below is
 
 | Item | Status |
 |---|---|
-| Stage | **M6 Integration done** on `feature/nathan-integration` (session 8): all six modules are called from `Application::RenderFrame()` and the shared theme is applied at startup + on change. Awaiting PR review into `development` |
-| Last milestone | Nathan's integration: module wiring, theme integration, integration bug fixes, full acceptance run on Windows/MSVC |
+| Stage | **M7 finishing** on `feature/nathan-finish` (session 9). Integration (session 8) merged into `main` via PR #2. Nathan finished Kim's and Lorens's remaining polish (scope change below); final screenshots are in `docs/screenshots/` |
+| Last milestone | Session 9: clang-format of Kim's/Lorens's files, taskbar launcher tooltips, assignment PDF cross-checked, PPT screenshots captured from Release |
 | Build | **PASS**: clean `x64-debug` and `x64-release` configure + build, 0 errors, **0 warnings** (`/W4`), VS Community 2026 (v18) / MSVC / bundled CMake + Ninja, 2026-10-11 |
 | Tests | **Every executed acceptance test PASSES** on a real interactive Windows display (Debug and Release). Two rows remain NOT RUN: VS IDE F5 flow and high-DPI/scaled displays (see checklist) |
-| Branch | `main` (stable) → `development` (created session 8 from `main` `fa5a6da`) → `feature/nathan-integration` (this work). `feature/lorens-ui-framework` merged via PR #1 |
+| Branch | `main` (has PR #2 = integration; note PR #2 went into `main` directly, so `development` is behind `main`) → `feature/nathan-finish` (session 9, branched from `main` `ef4f7f9`). `feature/lorens-ui-framework` merged via PR #1 |
 | Code style | Google C++ Style Guide: `lower_snake_case.cc/.h`, `desktop_os::` namespace, `.clang-format` in repo root (see docs/ARCHITECTURE.md "Coding style") |
-| Blockers | None in code. Open items: assignment PDF still not cross-checked against PROJECT_PLAN.md §2 · Byron's Task Manager commit (`fa5a6da`) has no session-log entry yet (Byron: please add one) |
-| Next steps | Review + merge `feature/nathan-integration` → `development` → `main` · each member re-runs the checklist on their own machine · capture final screenshots for the PPT (PPT_README.md §4) · confirm VS IDE F5 |
+| Blockers | None in code. PDF cross-checked (session 9): all functional requirements met. Open: VS IDE F5 not yet confirmed (the PDF's video must show pressing Run/Debug in the IDE) · video walkthrough MP4 must be recorded by the group and embedded in the PPTX |
+| Next steps | PR `feature/nathan-finish` → `main` (then fast-forward `development` to `main`) · confirm VS IDE F5 · build the PPT from PPT_README.md + `docs/screenshots/` · record the video walkthrough |
 
 | Feature | State |
 |---|---|
@@ -22,7 +22,7 @@ Read this first. The current snapshot stays at the top; the session log below is
 | Shared `AppState` | Implemented, verified (unchanged in session 8) |
 | Theme / Widgets | Implemented (Lorens), **wired + verified**: Midnight at startup, Slate ↔ Midnight live switch |
 | Clock / PWR button | Implemented (Lorens), **wired + verified**: clock ticks, PWR exits (Debug + Release) |
-| Taskbar | Implemented (Kim), **wired + verified**: 3 launchers, open indicators, 48 px full width |
+| Taskbar | Implemented (Kim), **wired + verified**: 3 launchers, open indicators, 48 px full width, hover tooltips (session 9, Nathan) |
 | File Explorer | Implemented (Kim), **wired + verified** (after session-8 sidebar/row hit-box fix) |
 | Settings | Implemented (Kim), **wired + verified** (after session-8 category hit-box fix) |
 | Task Manager | Implemented (Byron, `fa5a6da`), **wired + verified** |
@@ -58,6 +58,8 @@ screen captures of the client area). Evidence = screenshots inspected after each
 | PWR exits gracefully | PASS | Debug and Release exited within 5 s; Release exit code 0 |
 | Native window close exits cleanly | PASS | `WM_CLOSE` → exit code 0 (Release) |
 | Task Manager: processes, status, CPU %, memory, totals | PASS | 12 rows, Running/Suspended, CPU values wobble, totals header |
+| Taskbar launcher tooltips (session 9) | PASS | Hover shows "File Explorer" / "Settings" / "Task Manager" above the bar; `docs/screenshots/04*` |
+| Hover/active states in both themes (session 9) | PASS | Launcher hover + active fill, PWR red hover, Midnight and Slate; `docs/screenshots/04a-b`, `08a-b` |
 | Placeholder data labelled as simulated | PASS | Task Manager, Settings System/Display/About banners, desktop watermark |
 | Idle CPU reasonable (no busy loop) | PASS | 10 s idle sample: Debug 6.7 %, Release 3.4 % of one core (≈30 fps idle redraw by design) |
 | VS IDE "Open Folder" + F5 | NOT RUN | CLI with the same presets only |
@@ -329,3 +331,40 @@ All four are one-token fixes; no module was rewritten.
 2. **Everyone:** pull, build both presets, re-run the test checklist on your machine; confirm VS IDE F5.
 3. **Byron:** add a session-log entry for the Task Manager (`fa5a6da`).
 4. **Group:** capture final screenshots per PPT_README.md §4 from this build; cross-check requirements with the PDF.
+
+### Session 5b (backfilled): 2026-10-11, Byron — Task Manager (`fa5a6da`)
+
+*Byron did not write a log entry; Nathan reconstructed this one from the code in session 9.*
+
+**Objective:** requirements C1/C2, the Task Manager window.
+**Work:** `include/apps/task_manager.h` + `src/apps/task_manager.cc`. A dummy `struct Process { name, status, cpu_base, mem_mb }` array of 12 rows (2 Suspended). CPU % = `cpu_base` + a shared sine wobble over `ImGui::GetTime()` (amplitude 1.0, phase offset per row), clamped to 0-100; Suspended rows are exactly 0. A totals header (process count, summed CPU, summed memory) above a "Simulated dummy data, not actual system usage." banner. A 4-column `BeginTable` (Name / Status / CPU % / Memory (MB)) with frozen header, row backgrounds, resizable columns and right-aligned numbers. Fixed title "Task Manager", bound to `state.show_task_manager`, clamped above the taskbar like Kim's windows.
+**Verified:** in session 8 (see checklist row "Task Manager").
+
+### Session 9: 2026-10-11, Nathan (via Claude Code)
+
+**Scope change (decided by Nathan, 2026-10-11):** Nathan took over the remaining work of **Kim** (taskbar, File Explorer, Settings) and **Lorens** (theme, widgets, clock/PWR) to finish the project. This overrides the earlier "don't edit other members' files" rule for those modules. Credit for the modules stays with the original authors.
+
+**Objective:** `docs/NEXT_SESSION_HANDOFF.md`: clean up and polish Kim's and Lorens's parts, backfill Byron's log entry, cross-check the PDF, capture the PPT screenshots, and sync the docs.
+
+**Work completed**
+- Branch `feature/nathan-finish` from `main` `ef4f7f9` (PR #2 had already merged the integration into `main`).
+- K1/L1: `clang-format -i` (VS-bundled 22.1.3) on `file_explorer.cc`, `settings.cc`, `taskbar.cc` (Kim) and `system_controls.cc`, `widgets.cc`, `theme.h` (Lorens). Formatting only, two separate commits. Every project file now passes `clang-format --dry-run -Werror`.
+- K2: taskbar launchers show their app name as a tooltip on hover, anchored above the bar so it never covers the open indicators. Also fixed the stale taskbar comment that said system_controls renders *after* the taskbar.
+- L2: hover/active states checked in both themes (screenshots). No change needed.
+- L3 (bundled font): **skipped**. ProggyClean works, and the PDF has no font requirement.
+- L4 (high-DPI): **documented, not implemented**. The PDF doesn't require it, and the default 1280x720 window matches the PDF's 720p video maximum.
+- B2 (Task Manager sorting): **skipped**. The PDF only asks for a placeholder table with Processes, CPU and memory.
+- PDF cross-check (`MO4 - Desktop_GUI.pdf`, updated Sept 18 2026): see PROJECT_PLAN.md section 2. Every functional requirement is met. New non-code findings: the PPT must contain a **video walkthrough** with the **MP4 embedded in the PPTX**, the video must show **pressing Run/Debug in the IDE** (480p-720p, one uncut take, max 1 GB), and the README must name the entry file (it does: `src/main.cc`).
+- Screenshots: 20 PNGs in `docs/screenshots/`, from the Release build at 1280x720 (plus one resized). Each PPT_README.md section 4 item is mapped to a file there.
+
+**Build and test results**
+- `x64-debug` + `x64-release`: 0 warnings, 0 errors at `/W4` after every step.
+- GUI (Release, recreated PowerShell driver: `SetCursorPos`/`mouse_event` + `CopyFromScreen`, exit via `WM_CLOSE` → exit code 0 on every run): launcher tooltips; File Explorer sidebar → Downloads (breadcrumb `This PC > Local Disk (C:) > Users > kim > Downloads`), row select, double-click into `Local Disk (C:)`; Settings' 4 categories; all 3 wallpapers; theme Midnight → Slate → Midnight; all three apps open at once; resized 874x500. All PASS.
+- NOT RUN: VS IDE F5 (CLI only again). High-DPI.
+
+**Next member handoff**
+1. Open the PR `feature/nathan-finish` → `main` and merge it. Then bring `development` up to `main` (fast-forward) so the branches agree again.
+2. **Confirm VS IDE F5** (File > Open > Folder > x64 Debug > Build All > DesktopOS.exe > F5). The video has to show it, so do this before recording.
+3. Build the PPT: PPT_README.md (slide 2 is now "Video Walkthrough") + `docs/screenshots/`.
+4. Record the uncut video walkthrough at 720p and embed the MP4 in the PPTX. The group does this; Claude does not create videos.
+

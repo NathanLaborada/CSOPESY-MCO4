@@ -65,12 +65,13 @@ void Render(AppState& state) {
     const float text_width =
         ImGui::CalcTextSize(narrow ? time_text : date_text).x;
     const float cursor_y =
-        (kTaskbarHeight - ImGui::GetTextLineHeightWithSpacing() *
-                              (narrow ? 1.0f : 2.0f)) *
-            0.5f - 2.0f;
-    ImGui::SetCursorPos(ImVec2(window_size.x - text_width - kButtonSize -
-                                   kRightMargin - kGap * 2.0f,
-                               cursor_y > 4.0f ? cursor_y : 4.0f));
+        (kTaskbarHeight -
+         ImGui::GetTextLineHeightWithSpacing() * (narrow ? 1.0f : 2.0f)) *
+            0.5f -
+        2.0f;
+    ImGui::SetCursorPos(ImVec2(
+        window_size.x - text_width - kButtonSize - kRightMargin - kGap * 2.0f,
+        cursor_y > 4.0f ? cursor_y : 4.0f));
     ImGui::BeginGroup();
     ImGui::TextUnformatted(time_text);
     if (!narrow) {

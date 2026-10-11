@@ -111,13 +111,11 @@ bool IconButton(const char* id, IconKind kind, ImVec2 size, bool active) {
 
   ImU32 background = IM_COL32(0, 0, 0, 0);
   if (held) {
-    background = kind == IconKind::kPower
-                     ? IM_COL32(150, 40, 45, 255)
-                     : IM_COL32(60, 100, 190, 255);
+    background = kind == IconKind::kPower ? IM_COL32(150, 40, 45, 255)
+                                          : IM_COL32(60, 100, 190, 255);
   } else if (hovered) {
-    background = kind == IconKind::kPower
-                     ? IM_COL32(190, 60, 65, 255)
-                     : IM_COL32(74, 123, 224, 255);
+    background = kind == IconKind::kPower ? IM_COL32(190, 60, 65, 255)
+                                          : IM_COL32(74, 123, 224, 255);
   } else if (active) {
     background = IM_COL32(52, 78, 150, 255);
   } else {
@@ -134,8 +132,7 @@ bool IconButton(const char* id, IconKind kind, ImVec2 size, bool active) {
                       (rect_min.y + rect_max.y) * 0.5f);
   const float radius =
       (size.x < size.y ? size.x : size.y) * 0.5f - kIconPadding * 0.5f;
-  DrawIconShape(draw_list, kind, center,
-                radius > 4.0f ? radius : 4.0f,
+  DrawIconShape(draw_list, kind, center, radius > 4.0f ? radius : 4.0f,
                 IconColor(hovered, held, active));
   ImGui::PopID();
   return clicked;
