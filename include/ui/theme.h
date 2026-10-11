@@ -11,8 +11,7 @@ namespace theme {
 inline constexpr int kThemeCount = 2;
 
 // Display names indexed by theme. Keep in sync with Apply().
-inline constexpr const char* kThemeNames[kThemeCount] = {"Midnight",
-                                                         "Slate"};
+inline constexpr const char* kThemeNames[kThemeCount] = {"Midnight", "Slate"};
 
 // Applies the theme selected by `theme_index`. Any out-of-range value falls
 // back to theme 0. Call once during init AND again whenever theme_index
