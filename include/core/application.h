@@ -40,6 +40,9 @@ class Application {
   bool imgui_ready_ = false;
   bool glfw_backend_ready_ = false;
   bool opengl_backend_ready_ = false;
+  // Theme last passed to theme::Apply(); compared each frame with
+  // state_.theme_index so the style is rebuilt only when Settings changes it.
+  int applied_theme_index_ = 0;
   AppState state_;
 };
 

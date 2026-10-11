@@ -11,8 +11,8 @@ namespace settings {
 // Draws the Settings window while state.show_settings is true. Categories:
 // System, Display, Personalization, About. All information is simulated
 // placeholder data. The wallpaper picker writes state.wallpaper_index; the
-// theme picker writes state.theme_index (visible only after Nathan wires
-// theme::Apply into Application). The window clamps above the taskbar.
+// theme picker writes state.theme_index (Application re-applies the theme
+// when it changes). The window clamps above the taskbar.
 void Render(AppState& state);
 
 }  // namespace settings

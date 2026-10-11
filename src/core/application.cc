@@ -7,7 +7,13 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+#include "apps/file_explorer.h"
+#include "apps/settings.h"
+#include "apps/task_manager.h"
 #include "ui/desktop.h"
+#include "ui/system_controls.h"
+#include "ui/taskbar.h"
+#include "ui/theme.h"
 
 namespace desktop_os {
 namespace {
@@ -66,7 +72,8 @@ bool Application::Init() {
   ImGui::CreateContext();
   imgui_ready_ = true;
   ImGui::GetIO().IniFilename = nullptr;  // Same window layout every launch.
-  ImGui::StyleColorsDark();  // Lorens: replace with the shared theme.
+  theme::Apply(state_.theme_index);
+  applied_theme_index_ = state_.theme_index;
 
   if (!ImGui_ImplGlfw_InitForOpenGL(window_, true)) {
     std::fprintf(stderr, "[init] ImGui GLFW backend failed\n");
@@ -103,17 +110,29 @@ void Application::Run() {
 }
 
 void Application::RenderFrame() {
+  // Settings writes theme_index during a frame; restyle before the next one
+  // starts, and only when it actually changed.
+  if (state_.theme_index != applied_theme_index_) {
+    theme::Apply(state_.theme_index);
+    applied_theme_index_ = state_.theme_index;
+  }
+
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
 
+  // Order matters: wallpaper first, then the clock/PWR strip and taskbar, then
+  // the app windows (which clamp themselves above the taskbar).
+  // system_controls runs BEFORE taskbar on purpose: ImGui inserts a new
+  // NoBringToFrontOnFocus window at the back of the stack, so the window
+  // created last ends up lowest. In the planned order the opaque taskbar
+  // covered the clock and swallowed PWR clicks.
   desktop::Render(state_);
-  // Integration points: each module adds ONE call here, in this order.
-  //   taskbar::Render(state_);          Kim
-  //   system_controls::Render(state_);  Lorens (clock + PWR)
-  //   file_explorer::Render(state_);    Kim
-  //   settings::Render(state_);         Kim
-  //   task_manager::Render(state_);     Byron
+  system_controls::Render(state_);
+  taskbar::Render(state_);
+  file_explorer::Render(state_);
+  settings::Render(state_);
+  task_manager::Render(state_);
 
   ImGui::Render();
 

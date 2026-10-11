@@ -207,7 +207,7 @@ bool SidebarItem(const char* label, const std::vector<std::string>& target) {
   ImGui::SetCursorScreenPos(ImVec2(pos.x + 26.0f, pos.y));
   const bool active = g_path == target;
   const bool clicked =
-      ImGui::Selectable(label, active, 0, ImVec2(-1.0f, kRowHeight));
+      ImGui::Selectable(label, active, 0, ImVec2(0.0f, kRowHeight));
   if (clicked) NavigateTo(target);
   return clicked;
 }
@@ -291,7 +291,7 @@ void DrawListing(const Entry& node) {
           ("##sel_" + entry.name).c_str(), selected,
           ImGuiSelectableFlags_SpanAllColumns |
               ImGuiSelectableFlags_AllowDoubleClick,
-          ImVec2(-1.0f, kRowHeight));
+          ImVec2(0.0f, kRowHeight));
 
       ImGui::SetCursorScreenPos(
           ImVec2(cell.x + 3.0f, cell.y + kIconPadY));
