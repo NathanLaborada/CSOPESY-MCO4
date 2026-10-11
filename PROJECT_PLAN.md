@@ -1,6 +1,6 @@
 # PROJECT_PLAN — CSOPESY MO4 Desktop-Style OS Mockup
 
-Last updated: 2026-10-11 (Nathan, session 8: all modules wired into `Application`, theme integrated, acceptance checklist run on Windows/MSVC — statuses below reflect PASS results in `SESSION_HANDOFF.md`).
+Last updated: 2026-10-11 (Nathan, session 9: finished Kim's and Lorens's polish, cross-checked the assignment PDF, captured the PPT screenshots. Statuses below reflect PASS results in `SESSION_HANDOFF.md`).
 Status legend: **DONE** (implemented and verified) · **TODO** (not started) · **IN PROGRESS**.
 
 ## 1. Overview
@@ -9,7 +9,9 @@ This is a desktop-style operating system mockup written in C++17 with OpenGL, GL
 
 ## 2. Assignment requirements
 
-> **Note:** the assignment PDF (`MO4 - Desktop_GUI.pdf`) was **not in the workspace** during the first session. The requirements below come from the group's prompt (`ClaudePrompt-Nathan.md`). Whoever has the PDF should check this list against it and add anything missing.
+> **Cross-checked against the assignment PDF** (`MO4 - Desktop_GUI.pdf`, updated Sept 18 2026) in session 9. Its checklist has three requirements: **Desktop** (fills the window, wallpaper, real-time clock updated every frame in a fixed corner, PWR button as the way to close the app), **Taskbar** (fixed top/bottom panel, at least 3 clickable icon buttons: two open unique placeholder screens, the third opens the Task Manager) and **Task Manager** (resembles Windows', placeholder "Processes" table with CPU and memory, dummy values). All of them map to rows below and are DONE. A1-A5, D1, E1 and V1 are more detailed than the PDF; nothing in the PDF is missing.
+>
+> Non-code deliverables in the PDF: README.txt with names, run instructions and the entry file (`src/main.cc`, done); a PPT with Cover, **Video Walkthrough**, Architectural Diagram, Code Snippets and a written design discussion; and an uncut 480p-720p **MP4 embedded in the PPTX** that starts by pressing Run/Debug in the IDE. See PPT_README.md section 8.
 
 | # | Requirement | Owner | Status |
 |---|---|---|---|
@@ -30,7 +32,8 @@ This is a desktop-style operating system mockup written in C++17 with OpenGL, GL
 **Optional enhancements** (only after all of the above):
 - Wallpaper picker in Settings: DONE (Kim, verified).
 - Theme switcher (`theme_index`): DONE (Kim picker + Nathan re-apply, verified).
-- Task Manager sorting: not implemented.
+- Task Manager sorting: not implemented (not required by the PDF).
+- Taskbar launcher tooltips: DONE (session 9, Nathan finishing Kim's part).
 
 ## 3. Architecture
 
@@ -44,7 +47,8 @@ MCO4/
 ├── CMakePresets.json       x64-debug / x64-release (Ninja + MSVC)
 ├── .gitignore
 ├── README.txt  PROJECT_PLAN.md  PPT_README.md  SESSION_HANDOFF.md
-├── docs/{ARCHITECTURE.md, NATHAN_NEXTPLAN.md, KIM_MCO4_PLAN_HANDOFF_REVIEW.md}
+├── docs/{ARCHITECTURE.md, NATHAN_NEXTPLAN.md, NEXT_SESSION_HANDOFF.md,
+│        KIM_MCO4_PLAN_HANDOFF_REVIEW.md, screenshots/}
 ├── include/core/{application.h, app_state.h}
 ├── include/ui/{desktop,taskbar,theme,widgets,system_controls}.h
 ├── include/apps/{file_explorer,settings,task_manager}.h
@@ -104,8 +108,8 @@ Defined in `include/core/app_state.h`. Documented in `docs/ARCHITECTURE.md` (sec
 | M3 Shared UI | Theme, Widgets, clock, PWR (Lorens) | DONE 2026-10-11 (wired + verified) |
 | M4 Taskbar + apps | Taskbar, File Explorer, Settings (Kim) | DONE 2026-10-11 (wired + verified, small hit-box fixes) |
 | M5 Task Manager | Process data + table (Byron) | DONE 2026-10-11 (`fa5a6da`, wired + verified) |
-| M6 Integration | All `Render` calls wired; full test checklist | DONE 2026-10-11 on `feature/nathan-integration`; merge to `development` pending review |
-| M7 Docs + PPT | Final README/handoff/PPT guide refresh, screenshots | IN PROGRESS (docs refreshed in session 8; final screenshots + slides by the group) |
+| M6 Integration | All `Render` calls wired; full test checklist | DONE 2026-10-11, merged into `main` (PR #2) |
+| M7 Docs + PPT | Final README/handoff/PPT guide refresh, screenshots | Docs + screenshots DONE 2026-10-11 (session 9, `docs/screenshots/`). Remaining for the group: build the slides, record and embed the video, confirm VS IDE F5 |
 
 M3–M5 can run in parallel; each depends only on M1/M2. Kim's taskbar buttons should use Lorens's `widgets::IconButton` once it exists. Until then a plain `ImGui::Button` is fine and can be swapped later.
 
@@ -129,7 +133,7 @@ Use the checklist in `SESSION_HANDOFF.md` ("Test checklist"). Mark each test PAS
 | FetchContent needs internet + git on first configure | Documented in README; after the first configure, the deps are cached in `out/` |
 | GPU driver ignores vsync → 100% CPU | Loop uses `glfwWaitEventsTimeout` (verified ~0–5% CPU idle) |
 | Apps overlap taskbar | `kTaskbarHeight` constant; apps clamp position/size above it |
-| Assignment PDF not yet checked by Claude | Group member with the PDF cross-checks section 2 |
+| Video must start from the IDE's Run/Debug, but VS IDE F5 is not yet confirmed | Confirm F5 (README.txt "Build and run in Visual Studio") before recording |
 
 ## 12. Definition of done
 
@@ -138,5 +142,5 @@ Use the checklist in `SESSION_HANDOFF.md` ("Test checklist"). Mark each test PAS
 - [x] PWR and the window close button both exit with code 0 (Release verified; Debug PWR exit verified).
 - [x] Documentation matches the code. `SESSION_HANDOFF.md` is current.
 - [ ] Integration branch reviewed and merged into `development`, then `main`.
-- [ ] Requirements cross-checked against the assignment PDF.
+- [x] Requirements cross-checked against the assignment PDF (session 9).
 - [ ] VS IDE "Open Folder" + F5 confirmed by a member.
