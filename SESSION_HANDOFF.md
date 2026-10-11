@@ -2,67 +2,79 @@
 
 Read this first. The current snapshot stays at the top; the session log below is append-only (newest last).
 
-## Current project status (updated 2026-10-10)
+## Current project status (updated 2026-10-11)
 
 | Item | Status |
 |---|---|
-| Stage | M1 Foundation + M2 Desktop **done**; M3 Shared UI (Lorens) **merged to `main`** (PR #1, `b7109d5`) but **not yet wired** in `application.cc`; taskbar **implemented** (Kim, `0ada3c0`), not yet wired; File Explorer (Kim, `bdca7d1`) and Settings (Kim, `caf5e7c`) **implemented**, not yet wired; Task Manager not started; Kim/Byron working in parallel |
-| Last milestone | Nathan's core: CMake, GLFW/OpenGL 3.3/ImGui init, loop, shutdown, wallpaper, `AppState` |
-| Build | **PASS**: `x64-debug` and `x64-release` configure + build, 0 errors, 0 warnings in project code (`/W4`), VS Community 2026 18.10 / MSVC 14.51 / CMake 4.3.1 |
-| Tests | Launch, wallpaper, resize, window-close exit (code 0), idle CPU: **PASS**. Theme/widgets/system_controls compile + launch smoke test: **PASS** (Linux, temp wiring). PWR-click shutdown, taskbar, apps: **NOT RUN** (see session 3) |
-| Branch | `main` on https://github.com/NathanLaborada/CSOPESY-MCO4; `feature/lorens-ui-framework` **merged via PR #1** (`b7109d5`). No `development` branch exists yet. The Google-style rename (session 2) is **committed** as `568633b Changes with C++ style` |
+| Stage | **M6 Integration done** on `feature/nathan-integration` (session 8): all six modules are called from `Application::RenderFrame()` and the shared theme is applied at startup + on change. Awaiting PR review into `development` |
+| Last milestone | Nathan's integration: module wiring, theme integration, integration bug fixes, full acceptance run on Windows/MSVC |
+| Build | **PASS**: clean `x64-debug` and `x64-release` configure + build, 0 errors, **0 warnings** (`/W4`), VS Community 2026 (v18) / MSVC / bundled CMake + Ninja, 2026-10-11 |
+| Tests | **Every executed acceptance test PASSES** on a real interactive Windows display (Debug and Release). Two rows remain NOT RUN: VS IDE F5 flow and high-DPI/scaled displays (see checklist) |
+| Branch | `main` (stable) → `development` (created session 8 from `main` `fa5a6da`) → `feature/nathan-integration` (this work). `feature/lorens-ui-framework` merged via PR #1 |
 | Code style | Google C++ Style Guide: `lower_snake_case.cc/.h`, `desktop_os::` namespace, `.clang-format` in repo root (see docs/ARCHITECTURE.md "Coding style") |
-| Blockers | No code blockers. Open items: assignment PDF missing (requirements came from the prompt file, needs cross-check) · `development` branch does not exist yet (PR target undecided) |
-| Next steps | Nathan: create `development` · Lorens: theme/widgets/system_controls (done, merged) · Kim: all three modules coded (sessions 4–6), awaiting Nathan integration + acceptance tests · Byron: task_manager · Nathan: wire each `Render` call as modules arrive |
+| Blockers | None in code. Open items: assignment PDF still not cross-checked against PROJECT_PLAN.md §2 · Byron's Task Manager commit (`fa5a6da`) has no session-log entry yet (Byron: please add one) |
+| Next steps | Review + merge `feature/nathan-integration` → `development` → `main` · each member re-runs the checklist on their own machine · capture final screenshots for the PPT (PPT_README.md §4) · confirm VS IDE F5 |
 
 | Feature | State |
 |---|---|
 | Graphics init + shutdown | Implemented, verified |
-| Desktop wallpaper (3 styles) | Implemented, verified (all 3 screenshotted) |
-| Shared `AppState` | Implemented |
-| Theme / Widgets | Implemented (Lorens) on `feature/lorens-ui-framework`; Linux build PASS, smoke-tested with temp wiring; needs Nathan wiring (see session 3) |
-| Clock / PWR button | Implemented (Lorens) on `feature/lorens-ui-framework`. Smoke test PASS (app ran 8 s, no crash). PWR-click exit and cross-size readability: **NOT RUN** (button not yet wired in committed code). Shutdown path itself already verified via window close |
-| Taskbar | Implemented (Kim, `0ada3c0`); not yet wired in `application.cc`; click/visual checklist rows NOT RUN (see session 4) |
-| File Explorer | Implemented (Kim, `bdca7d1`); not yet wired; tests NOT RUN (session 5) |
-| Settings | Implemented (Kim, `caf5e7c`); not yet wired; tests NOT RUN (session 6) |
-| Task Manager | Not started (Byron) |
+| Desktop wallpaper (3 styles) | Implemented, verified (all 3 switched live via Settings) |
+| Shared `AppState` | Implemented, verified (unchanged in session 8) |
+| Theme / Widgets | Implemented (Lorens), **wired + verified**: Midnight at startup, Slate ↔ Midnight live switch |
+| Clock / PWR button | Implemented (Lorens), **wired + verified**: clock ticks, PWR exits (Debug + Release) |
+| Taskbar | Implemented (Kim), **wired + verified**: 3 launchers, open indicators, 48 px full width |
+| File Explorer | Implemented (Kim), **wired + verified** (after session-8 sidebar/row hit-box fix) |
+| Settings | Implemented (Kim), **wired + verified** (after session-8 category hit-box fix) |
+| Task Manager | Implemented (Byron, `fa5a6da`), **wired + verified** |
 
 ### Test checklist
 
+Run 2026-10-11 by Nathan (via Claude Code) on Windows 11 Pro with a real 1280x720
+window, driven by a PowerShell script (user32 `SetCursorPos`/`mouse_event` clicks,
+screen captures of the client area). Evidence = screenshots inspected after each step.
+
 | Test | Result | Evidence |
 |---|---|---|
-| App launches | PASS | Debug + Release launched by script |
-| Desktop fills client area | PASS | Screenshot at 1280x720 and 1700x950 |
-| Wallpaper visible | PASS | Screenshots of Midnight, Aurora, Slate (index temporarily changed for test, then reverted) |
-| Clock shows current time / updates | NOT RUN | implemented on `main` (session 3), not wired |
-| Resizing doesn't break desktop | PASS | Window resized to 1700x950 via MoveWindow; wallpaper + watermark followed |
-| PWR exits cleanly | NOT RUN | implemented on `main` (session 3), not wired; same exit path verified via window close |
-| Window close exits cleanly | PASS | `CloseMainWindow()` → exit code 0 in ~100 ms, Debug and Release |
-| Idle CPU reasonable | PASS | ~0–5% of one core (was ~107% before throttling fix) |
-| Taskbar visible, ≥3 buttons, opens each app | NOT RUN | implemented `0ada3c0`, not wired; needs a real display (see session 4) |
-| Close app ≠ close desktop; reopen | NOT RUN | File Explorer implemented but unwired; Settings / Task Manager not implemented |
-| Task Manager table / names / CPU / memory | NOT RUN | not implemented |
 | CMake configure succeeds | PASS | `cmake --preset x64-debug` / `x64-release` |
-| Compiles without unresolved symbols | PASS | |
-| ImGui sources compiled exactly once | PASS | Only the `imgui` target lists them |
-| Clean build attempted | PASS | Fresh `out/` on first configure |
+| Debug + Release build, 0 warnings | PASS | `cmake --build --preset <p> --clean-first`: 0 warnings, 0 errors at `/W4` |
+| No unresolved symbols / duplicate ImGui symbols | PASS | Link succeeded; ImGui `.cpp` files only in the `imgui` target |
+| App launches (Debug + Release) | PASS | Both exes launched by script |
+| Desktop fills client area | PASS | Screenshots at 1280x720, 874x500, 1674x879 |
+| All 3 wallpapers render | PASS | Midnight → Aurora → Slate via the Settings picker |
+| Resizing keeps background + UI positioned | PASS | Resized small and large: taskbar/clock/PWR follow the bottom edge; app windows re-clamp above the taskbar |
+| Taskbar fixed, full width, 48 px, visible | PASS | Screenshots at three sizes |
+| Taskbar opens File Explorer / Settings / Task Manager | PASS | One click each |
+| Open indicators match visibility | PASS | Indicator appears on open, disappears after the window's X |
+| Close app ≠ close desktop | PASS | File Explorer X closed only that window |
+| Close + reopen, no duplicate windows | PASS | Reopened; launcher clicked twice → still one window |
+| All three apps open at once | PASS | Layout intact, taskbar unobstructed |
+| No app window obscures the taskbar | PASS | Windows clamp above `kTaskbarHeight`, also after shrinking |
+| File Explorer: sidebar, breadcrumb, selection, double-click folder | PASS | Downloads via sidebar; breadcrumb shows full path; row select; double-click "Local Disk (C:)" enters it |
+| Settings: all 4 categories selectable | PASS | System, Display, Personalization, About |
+| Wallpaper picker changes wallpaper | PASS | See wallpaper row |
+| Theme picker: Midnight ↔ Slate visibly | PASS | Window/frame colors navy → grey → navy |
+| Wallpaper independent of theme | PASS | Slate wallpaper kept while the theme switched both ways |
+| Clock shows local time and updates | PASS | Seconds advance across screenshots and match system time |
+| PWR exits gracefully | PASS | Debug and Release exited within 5 s; Release exit code 0 |
+| Native window close exits cleanly | PASS | `WM_CLOSE` → exit code 0 (Release) |
+| Task Manager: processes, status, CPU %, memory, totals | PASS | 12 rows, Running/Suspended, CPU values wobble, totals header |
+| Placeholder data labelled as simulated | PASS | Task Manager, Settings System/Display/About banners, desktop watermark |
+| Idle CPU reasonable (no busy loop) | PASS | 10 s idle sample: Debug 6.7 %, Release 3.4 % of one core (≈30 fps idle redraw by design) |
+| VS IDE "Open Folder" + F5 | NOT RUN | CLI with the same presets only |
+| High-DPI / display scaling > 100 % | NOT RUN | Known limitation (1:1 pixels) |
 
-### Post-integration acceptance checklist (after Nathan wires the modules)
+### Post-integration acceptance checklist (from `docs/replies/reply-gpt5.md`)
 
-Source: `docs/replies/reply-gpt5.md`. Only mark a requirement DONE when its
-row here passes on a real integrated build — macOS smoke tests only prove
-the code builds and launches.
-
-| Test | What counts as passing |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Taskbar layout | Fixed, full-width, 48-pixel-high bottom bar that does not overlap clock/PWR controls |
-| Launch buttons | File Explorer and Settings open correctly; Task Manager opens once Byron's implementation exists |
-| Open indicators | Indicator matches each app's visibility and disappears when the app closes |
-| File Explorer | Sidebar shortcuts, breadcrumb navigation, selection, and double-click folder navigation all work |
-| Settings | All four categories work, the wallpaper selector changes the wallpaper, and the theme selector visibly changes the theme |
-| Window behavior | Closing an app does not close the desktop, and the app can be reopened |
-| Resizing | Windows remain usable and do not obstruct the taskbar |
-| Windows/MSVC | `x64-debug` + `x64-release` build clean; record the tester's name and actual results — do not infer a Windows pass from a macOS build |
+| Test | Result |
+| --------------- | ------ |
+| Taskbar layout (48 px, full width, no overlap with clock/PWR) | PASS (after the session-8 render-order fix) |
+| Launch buttons (all three) | PASS |
+| Open indicators | PASS |
+| File Explorer (sidebar, breadcrumb, selection, double-click) | PASS (after the session-8 hit-box fix) |
+| Settings (4 categories, wallpaper, theme) | PASS (after the session-8 hit-box fix) |
+| Window behavior (close ≠ exit, reopen) | PASS |
+| Resizing | PASS |
+| Windows/MSVC `x64-debug` + `x64-release` | PASS (tester: Nathan via Claude Code, 2026-10-11) |
 
 ---
 
@@ -277,3 +289,43 @@ or: Visual Studio > File > Open > Folder > x64 Debug > Build All > DesktopOS.exe
 **Objective:** Reconcile the last stale plan rows and record the post-integration acceptance checklist (reply-gpt5 review).
 **Work:** `PROJECT_PLAN.md` M3/A3/A4/V1 changed TODO → IN PROGRESS with explicit "merged but not wired/verified" qualifiers — no requirement was marked DONE; Nathan and Lorens should confirm these rows. Added the "Post-integration acceptance checklist" section above (source: `docs/replies/reply-gpt5.md`) for whoever runs the integrated tests (Windows/MSVC row included).
 **No code changes.** All three Kim modules remain `0ada3c0` / `bdca7d1` / `caf5e7c`; `application.cc` still awaits Nathan's wiring; branch/PDF questions still open in the group chat.
+
+### Session 8: 2026-10-11, Nathan (via Claude Code)
+
+**Objective:** `docs/NATHAN_NEXTPLAN.md`: integrate every module into `Application`, wire the shared theme, build with the intended toolchain, run the acceptance tests on a real display, and sync the docs.
+
+**Work completed**
+- Branches: created `development` from `main` (`fa5a6da`) and `feature/nathan-integration` from it. No history rewritten.
+- `src/core/application.cc`: includes for all seven module headers; `RenderFrame()` now calls `desktop` → `system_controls` → `taskbar` → `file_explorer` → `settings` → `task_manager`.
+- Theme: `ImGui::StyleColorsDark()` replaced by `theme::Apply(state_.theme_index)` in `Init()`. `RenderFrame()` compares `state_.theme_index` with a new private member `applied_theme_index_` **before** `ImGui::NewFrame()` and re-applies only on change (no global, no per-frame restyle). Out-of-range values are left to `theme::Apply`'s fallback.
+- `AppState` unchanged.
+
+**Problems found by the interactive test and fixed**
+1. **Clock/PWR hidden and PWR unclickable** (fixed in `application.cc` only). Taskbar and system_controls both use `NoBringToFrontOnFocus`. ImGui inserts such a window at the *back* of the window stack when it is first created, so in the planned order (taskbar, then system_controls) the clock window ended up behind the 92 %-opaque taskbar, which also swallowed the PWR click (verified: clicking PWR did nothing). Fix: render `system_controls` **before** `taskbar`. Documented deviation from the planned order; commented in code. Session 4's note "rendered next = drawn on top" does not hold for this flag.
+2. **File Explorer sidebar labels clipped to one character; sidebar and listing rows not clickable** (Kim, `file_explorer.cc`). `ImGui::Selectable` treats a width of `-1` literally (zero-width hit box); only `0` means "span the available width". Two `ImVec2(-1.0f, ...)` → `ImVec2(0.0f, ...)`.
+3. **Settings categories not clickable** (Kim, `settings.cc`): same `-1` width bug, same fix.
+4. **About page showed `MCO4 ? desktop-style`** (Kim, `settings.cc`): the em dash is outside the default font's glyph range; replaced with `-`.
+
+All four are one-token fixes; no module was rewritten.
+
+**Files changed:** `src/core/application.cc`, `include/core/application.h`, `src/apps/file_explorer.cc`, `src/apps/settings.cc`, `SESSION_HANDOFF.md`, `PROJECT_PLAN.md`, `docs/ARCHITECTURE.md`, `README.txt`, `PPT_README.md`; added `docs/NATHAN_NEXTPLAN.md` (the task brief).
+
+**Build and test results**
+- Environment: Windows 11 Pro, VS Community 2026 (v18), `VsDevCmd.bat -arch=x64`, bundled CMake + Ninja.
+- Commands: `cmake --preset x64-debug`, `cmake --build --preset x64-debug`, same for `x64-release`; final `--clean-first` rebuild of both: 0 warnings, 0 errors.
+- GUI: see the test checklist above. All executed rows PASS; VS IDE F5 and high-DPI NOT RUN.
+
+**Current limitations**
+- Default ImGui font (ProggyClean) renders only basic Latin-1 glyphs. Avoid `—`, `→` and emoji in UI strings.
+- High-DPI scaling not handled (1:1 pixels).
+- Idle redraw ≈30 fps by design (≈3–7 % of one core when idle).
+
+**Decisions (please don't reverse without discussing)**
+- Render order is `desktop, system_controls, taskbar, apps` (see problem 1). If anyone adds another `NoBringToFrontOnFocus` window, remember that the one created *last* is drawn *lowest*.
+- Theme re-apply happens in `Application`, outside the ImGui frame, cached in `applied_theme_index_`.
+
+**Next member handoff**
+1. **Kim / Lorens / Byron:** review the PR into `development`, especially the one-token fixes in Kim's files and the render-order note affecting Lorens's overlay.
+2. **Everyone:** pull, build both presets, re-run the test checklist on your machine; confirm VS IDE F5.
+3. **Byron:** add a session-log entry for the Task Manager (`fa5a6da`).
+4. **Group:** capture final screenshots per PPT_README.md §4 from this build; cross-check requirements with the PDF.
