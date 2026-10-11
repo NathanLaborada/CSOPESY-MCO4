@@ -28,7 +28,7 @@ const ImVec4 kBarBackground(0.06f, 0.07f, 0.12f, 0.92f);
 struct LaunchButton {
   const char* id;
   widgets::IconKind kind;
-  bool AppState::*show;
+  bool AppState::* show;
 };
 
 // Left-to-right order; all buttons sit left of the system_controls strip.
@@ -45,9 +45,9 @@ constexpr LaunchButton kLaunchButtons[] = {
 void Render(AppState& state) {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
   const ImVec2 bar_size(viewport->WorkSize.x, kTaskbarHeight);
-  const ImVec2 bar_pos(viewport->WorkPos.x, viewport->WorkPos.y +
-                                                viewport->WorkSize.y -
-                                                kTaskbarHeight);
+  const ImVec2 bar_pos(
+      viewport->WorkPos.x,
+      viewport->WorkPos.y + viewport->WorkSize.y - kTaskbarHeight);
 
   ImGui::SetNextWindowPos(bar_pos);
   ImGui::SetNextWindowSize(bar_size);
@@ -86,8 +86,7 @@ void Render(AppState& state) {
       const float indicator_y = button_pos.y + kButtonSize + kIndicatorGap;
       ImGui::GetWindowDrawList()->AddRectFilled(
           ImVec2(indicator_x, indicator_y),
-          ImVec2(indicator_x + kIndicatorWidth,
-                 indicator_y + kIndicatorHeight),
+          ImVec2(indicator_x + kIndicatorWidth, indicator_y + kIndicatorHeight),
           kIndicatorColor, kIndicatorRadius);
     }
     x += kButtonSize + kButtonGap;

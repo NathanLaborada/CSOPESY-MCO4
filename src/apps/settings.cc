@@ -27,8 +27,8 @@ constexpr float kDefaultHeight = 470.0f;
 constexpr float kMinWidth = 480.0f;
 constexpr float kMinHeight = 300.0f;
 
-constexpr const char* kCategories[] = {"System", "Display",
-                                       "Personalization", "About"};
+constexpr const char* kCategories[] = {"System", "Display", "Personalization",
+                                       "About"};
 constexpr int kCategoryCount = 4;
 
 // Module-private UI state: which category is shown.
@@ -36,8 +36,7 @@ int g_category = 0;
 
 // A muted "label: value" line of simulated system information.
 void InfoRow(const char* label, const char* value) {
-  ImGui::PushStyleColor(ImGuiCol_Text,
-                        ImVec4(0.62f, 0.65f, 0.72f, 1.00f));
+  ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.62f, 0.65f, 0.72f, 1.00f));
   ImGui::Text("%s:", label);
   ImGui::PopStyleColor();
   ImGui::SameLine();
@@ -166,8 +165,8 @@ void Render(AppState& state) {
                           ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSize(ImVec2(kDefaultWidth, kDefaultHeight),
                            ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSizeConstraints(
-      ImVec2(kMinWidth, kMinHeight), ImVec2(FLT_MAX, FLT_MAX));
+  ImGui::SetNextWindowSizeConstraints(ImVec2(kMinWidth, kMinHeight),
+                                      ImVec2(FLT_MAX, FLT_MAX));
 
   const bool visible = ImGui::Begin(kWindowTitle, &state.show_settings);
   ClampAboveTaskbar();
