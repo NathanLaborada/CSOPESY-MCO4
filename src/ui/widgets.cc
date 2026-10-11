@@ -66,10 +66,7 @@ void DrawTaskManager(ImDrawList* draw_list, ImVec2 center, float radius,
 
 void DrawPower(ImDrawList* draw_list, ImVec2 center, float radius,
                ImU32 color) {
-  // Open ring with a gap centered at the top. ImGui angles start at +x and
-  // grow clockwise (y points down), so the top is at -pi/2; the arc runs
-  // from one side of the gap around to the other, spanning under 360
-  // degrees so it never overlaps itself.
+  // Draw a power icon with a gap at the top. ImGui angles start at the right and increase clockwise.
   constexpr float kHalfPi = 1.5707963f;
   constexpr float kGapHalf = 0.45f;
   const float start = -kHalfPi + kGapHalf;

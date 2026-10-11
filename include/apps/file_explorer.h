@@ -1,4 +1,4 @@
-// File Explorer window: sidebar, breadcrumb bar and a placeholder listing.
+// File Explorer window with a sidebar and a sample file list.
 
 #ifndef DESKTOP_OS_APPS_FILE_EXPLORER_H_
 #define DESKTOP_OS_APPS_FILE_EXPLORER_H_
@@ -8,9 +8,7 @@
 namespace desktop_os {
 namespace file_explorer {
 
-// Draws the File Explorer window while state.show_file_explorer is true.
-// The folder tree is simulated in-memory placeholder data; the module never
-// touches the real filesystem. The window clamps itself above the taskbar.
+// Draw the window when state.show_file_explorer is true. The folder tree is sample data. The window stays above the taskbar.
 void Render(AppState& state);
 
 }  // namespace file_explorer

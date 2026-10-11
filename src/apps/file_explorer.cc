@@ -14,10 +14,10 @@ namespace desktop_os {
 namespace file_explorer {
 namespace {
 
-// Window title must stay fixed so ImGui never creates a duplicate window.
+// Keep one window title to prevent duplicate windows.
 constexpr const char* kWindowTitle = "File Explorer";
 
-// Layout constants (Google style: k + PascalCase).
+// Layout constants use the project naming style.
 constexpr float kSidebarWidth = 175.0f;
 constexpr float kPathBarHeight = 36.0f;
 constexpr float kRowHeight = 24.0f;
@@ -25,7 +25,7 @@ constexpr float kIconSize = 16.0f;
 constexpr float kIconGap = 8.0f;
 constexpr float kIconPadY = 4.0f;
 
-// Placeholder window placement, used until the user moves/resizes it.
+// These values set the window's first position and size.
 constexpr float kDefaultPosX = 70.0f;
 constexpr float kDefaultPosY = 56.0f;
 constexpr float kDefaultWidth = 780.0f;
@@ -33,13 +33,12 @@ constexpr float kDefaultHeight = 500.0f;
 constexpr float kMinWidth = 460.0f;
 constexpr float kMinHeight = 260.0f;
 
-// Icon colors: accent-blue folders, muted grey files (no emoji, no fonts).
+// Use simple shapes for icons. No extra fonts are needed.
 constexpr ImU32 kFolderColor = IM_COL32(122, 156, 236, 255);
 constexpr ImU32 kFileColor = IM_COL32(170, 178, 196, 255);
 constexpr ImU32 kChevronColor = IM_COL32(158, 165, 183, 255);
 
-// One node of the simulated filesystem. Folders own their children; files
-// only carry display strings. All data is static placeholder content.
+// Each entry represents a file or folder. All entries are sample data.
 struct Entry {
   std::string name;
   bool is_folder = false;
@@ -71,8 +70,7 @@ Entry File(std::string name, std::string type, std::string size,
   return entry;
 }
 
-// The simulated tree: "This PC" is the root, so the default breadcrumb is
-// one segment and every listing below it is reachable from the sidebar.
+// The sample tree uses This PC as its root.
 Entry BuildTree() {
   return Folder(
       "This PC",
@@ -130,13 +128,12 @@ const Entry& Root() {
   return root;
 }
 
-// Module-private UI state: current folder path and selected entry name.
+// Store the current folder path and selected entry.
 std::vector<std::string> g_path{"This PC"};
 std::string g_selected;
 
 const Entry* FindPath(const std::vector<std::string>& path) {
-  // path[0] must be the root's own name ("This PC"); segments after that
-  // walk down through children.
+  // The first path item must match the root. Later items name child entries.
   if (path.empty() || path.front() != Root().name) return nullptr;
   const Entry* node = &Root();
   for (size_t i = 1; i < path.size(); ++i) {
@@ -155,7 +152,7 @@ void NavigateTo(const std::vector<std::string>& path) {
   g_selected.clear();
 }
 
-// Paper-document icon with a folded corner, drawn with ImDrawList shapes.
+// Draw a file icon with a folded corner.
 void DrawFileIcon(ImDrawList* draw_list, ImVec2 top_left, float size) {
   const float fold = size * 0.30f;
   draw_list->PathLineTo(top_left);
@@ -174,7 +171,7 @@ void DrawFileIcon(ImDrawList* draw_list, ImVec2 top_left, float size) {
 
 void DrawRowIcon(ImDrawList* draw_list, const Entry& entry, ImVec2 top_left) {
   if (entry.is_folder) {
-    // Folder silhouette: tab over a rounded body (same idea as widgets).
+    // Draw a folder icon with a tab and rounded body.
     const float s = kIconSize;
     const ImVec2 tab_min(top_left.x, top_left.y + s * 0.15f);
     const ImVec2 tab_max(top_left.x + s * 0.55f, top_left.y + s * 0.35f);
@@ -187,7 +184,7 @@ void DrawRowIcon(ImDrawList* draw_list, const Entry& entry, ImVec2 top_left) {
   }
 }
 
-// Path of `name` below `base`, for sidebar jumps.
+// Return the path to a child named name under base.
 std::vector<std::string> ChildPath(const std::vector<std::string>& base,
                                    const char* name) {
   std::vector<std::string> path = base;
@@ -195,7 +192,7 @@ std::vector<std::string> ChildPath(const std::vector<std::string>& base,
   return path;
 }
 
-// A sidebar row: folder icon + full-width clickable label.
+// Draw one clickable folder row in the sidebar.
 bool SidebarItem(const char* label, const std::vector<std::string>& target) {
   const ImVec2 pos = ImGui::GetCursorScreenPos();
   ImGui::SetCursorScreenPos(ImVec2(pos.x + 4.0f, pos.y + 3.0f));
@@ -208,8 +205,7 @@ bool SidebarItem(const char* label, const std::vector<std::string>& target) {
   return clicked;
 }
 
-// Breadcrumb: "This PC > Local Disk (C:) > ..." where each segment jumps
-// to that prefix of the current path.
+// Each breadcrumb button opens that part of the path.
 void DrawPathBar() {
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.0f, 4.0f));
   ImGui::BeginChild("##pathbar", ImVec2(0.0f, kPathBarHeight), true);
@@ -230,7 +226,7 @@ void DrawPathBar() {
   ImGui::PopStyleVar();
 }
 
-// Left navigation pane: Quick access jumps plus the This PC drive.
+// Draw the navigation sidebar.
 void DrawSidebar() {
   ImGui::BeginChild("##sidebar", ImVec2(kSidebarWidth, 0.0f), true);
   widgets::MutedText("Quick access");
@@ -245,8 +241,7 @@ void DrawSidebar() {
   ImGui::EndChild();
 }
 
-// Main pane: header row plus the file/folder table. Click selects;
-// double-clicking a folder navigates into it.
+// Draw the file and folder table. Click a row to select it. Double-click a folder to open it.
 void DrawListing(const Entry& node) {
   if (ImGui::BeginTable("##files", 4,
                         ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_RowBg |
@@ -275,7 +270,7 @@ void DrawListing(const Entry& node) {
       const ImVec2 cell = ImGui::GetCursorScreenPos();
       const bool selected = g_selected == entry.name;
 
-      // Invisible full-row target first; icon and label are drawn on top.
+      // Use a full-row click target. Draw the icon and name above it.
       ImGui::SetCursorScreenPos(cell);
       const bool clicked =
           ImGui::Selectable(("##sel_" + entry.name).c_str(), selected,
@@ -311,9 +306,7 @@ void DrawListing(const Entry& node) {
   }
 }
 
-// Snap the window so its bottom edge never enters the taskbar strip.
-// Uses public per-window setters right after Begin, so user drags and
-// resizes still stick (they are re-clamped from live values each frame).
+// Keep the window above the taskbar. Check its position and size each frame.
 void ClampAboveTaskbar() {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
   const float limit_y = viewport->Pos.y + viewport->Size.y - kTaskbarHeight;
@@ -324,7 +317,7 @@ void ClampAboveTaskbar() {
 
   pos.y = limit_y - size.y;
   if (pos.y < viewport->Pos.y) {
-    // Window is taller than the space above the taskbar: shrink it.
+    // If the window is too tall, reduce its height.
     pos.y = viewport->Pos.y;
     size.y = limit_y - pos.y;
     ImGui::SetWindowSize(size);

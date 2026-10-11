@@ -1,4 +1,4 @@
-// Live clock and PWR button at the right end of the taskbar area.
+// Clock and PWR button on the right side of the taskbar.
 
 #ifndef DESKTOP_OS_UI_SYSTEM_CONTROLS_H_
 #define DESKTOP_OS_UI_SYSTEM_CONTROLS_H_
@@ -8,14 +8,10 @@
 namespace desktop_os {
 namespace system_controls {
 
-// Horizontal space reserved at the right end of the taskbar for the clock
-// and PWR button. Kim: keep taskbar launch buttons clear of this strip so
-// the two modules never overlap or intercept each other's clicks.
+// Space reserved for the clock and PWR button. Keep app buttons out of this area.
 inline constexpr float kSystemControlsWidth = 260.0f;
 
-// Draws HH:MM:SS, the local date and the PWR button. Clicking PWR sets
-// `state.shutdown_requested = true`; Application::Run() then exits and the
-// destructor performs the orderly shutdown.
+// Draw the current time, date, and PWR button. PWR sets shutdown_requested. The main loop then exits.
 void Render(AppState& state);
 
 }  // namespace system_controls

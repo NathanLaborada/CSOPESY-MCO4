@@ -1,4 +1,4 @@
-// Program entry point.
+// Start the application.
 
 #include "core/application.h"
 

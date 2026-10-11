@@ -1,4 +1,4 @@
-// Reusable drawn widgets shared by the taskbar and application screens.
+// Reusable icons and labels for the UI.
 
 #ifndef DESKTOP_OS_UI_WIDGETS_H_
 #define DESKTOP_OS_UI_WIDGETS_H_
@@ -8,7 +8,7 @@
 namespace desktop_os {
 namespace widgets {
 
-// Geometric icon kinds drawn with ImDrawList. No emoji or custom fonts.
+// Icon types drawn with ImDrawList.
 enum class IconKind {
   kFolder,
   kSettings,
@@ -16,17 +16,13 @@ enum class IconKind {
   kPower,
 };
 
-// Clickable icon button with hover, pressed (held) and active/selected
-// states. `id` must be stable while the button is visible. `size` is the
-// full clickable area including padding. Returns true when clicked.
-// The icon is drawn geometrically, so it works without extra fonts.
+// Draw a clickable icon button. Keep id the same while the button is visible. size includes the clickable area and padding. Return true when the user clicks the button.
 bool IconButton(const char* id, IconKind kind, ImVec2 size, bool active);
 
-// Draws a single geometric icon at the current cursor position. Advances the
-// cursor by `size`. Useful for inline listing icons (e.g. File Explorer).
+// Draw an icon at the current cursor. Move the cursor by size.
 void Icon(IconKind kind, float size, ImU32 color);
 
-// Small dimmed label for section headers and helper text.
+// Draw a small, dim label.
 void MutedText(const char* text);
 
 }  // namespace widgets

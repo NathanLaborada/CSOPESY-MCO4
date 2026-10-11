@@ -18,8 +18,7 @@ void DrawVerticalGradient(ImDrawList* draw_list, ImVec2 top_left,
                                      top_color, bottom_color, bottom_color);
 }
 
-// Soft radial glow: a triangle fan whose center vertex is `inner_color` and
-// whose rim is fully transparent; the GPU interpolates a smooth gradient.
+// Draw a soft glow with a solid center and transparent edge.
 void DrawGlow(ImDrawList* draw_list, ImVec2 center, float radius,
               ImU32 inner_color) {
   constexpr int kSegments = 64;
@@ -56,8 +55,7 @@ void DrawDotGrid(ImDrawList* draw_list, ImVec2 top_left, ImVec2 bottom_right,
   }
 }
 
-// Draws `line_count` sine-wave lines; the first sits `start_fraction` of the
-// way down the screen and each following line a little lower.
+// Draw sine-wave lines at increasing vertical positions.
 void DrawWaves(ImDrawList* draw_list, ImVec2 top_left, ImVec2 bottom_right,
                float start_fraction, int line_count, ImU32 color) {
   constexpr int kPointCount = 97;
@@ -139,7 +137,7 @@ void Render(const AppState& state) {
       break;
   }
 
-  // Small watermark above the taskbar, bottom-right.
+  // Draw a small label above the taskbar.
   const char* watermark = "CSOPESY Desktop OS  |  simulated environment";
   const ImVec2 text_size = ImGui::CalcTextSize(watermark);
   draw_list->AddText(

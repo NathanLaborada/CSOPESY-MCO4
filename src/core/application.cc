@@ -18,8 +18,7 @@
 namespace desktop_os {
 namespace {
 
-// OpenGL 3.3 core is supported by every Windows GPU driver from the last
-// decade and matches GLSL "#version 330" for the ImGui OpenGL3 backend.
+// Use OpenGL 3.3 and GLSL 330 for the ImGui OpenGL backend.
 constexpr int kGlMajorVersion = 3;
 constexpr int kGlMinorVersion = 3;
 constexpr const char* kGlslVersion = "#version 330";
@@ -29,8 +28,7 @@ constexpr int kInitialHeight = 720;
 constexpr int kMinWidth = 800;
 constexpr int kMinHeight = 500;
 
-// Redraw interval when nothing is happening (clock, simulated Task Manager
-// values). Input wakes the loop immediately, so interaction stays responsive.
+// Wait up to this interval when idle. The clock and sample values still update.
 constexpr double kIdleFrameSeconds = 1.0 / 30.0;
 
 void GlfwErrorCallback(int code, const char* description) {
@@ -93,13 +91,12 @@ bool Application::Init() {
 }
 
 void Application::Run() {
-  // Exits on PWR (state_.shutdown_requested) or the native close button.
+  // Stop when PWR is clicked or the window is closed.
   while (!state_.shutdown_requested && !glfwWindowShouldClose(window_)) {
-    // Sleep until input arrives or the idle timeout passes. Vsync alone did
-    // not stop busy-looping on the Intel Arc test machine.
+    // Wait for input or the idle timeout to avoid busy looping.
     glfwWaitEventsTimeout(kIdleFrameSeconds);
 
-    // Minimized: block until something happens instead of spinning.
+    // When minimized, wait for an event instead of drawing frames.
     if (glfwGetWindowAttrib(window_, GLFW_ICONIFIED)) {
       glfwWaitEvents();
       continue;
@@ -110,8 +107,7 @@ void Application::Run() {
 }
 
 void Application::RenderFrame() {
-  // Settings writes theme_index during a frame; restyle before the next one
-  // starts, and only when it actually changed.
+  // Apply the selected theme after the settings value changes.
   if (state_.theme_index != applied_theme_index_) {
     theme::Apply(state_.theme_index);
     applied_theme_index_ = state_.theme_index;
@@ -121,12 +117,7 @@ void Application::RenderFrame() {
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
 
-  // Order matters: wallpaper first, then the clock/PWR strip and taskbar, then
-  // the app windows (which clamp themselves above the taskbar).
-  // system_controls runs BEFORE taskbar on purpose: ImGui inserts a new
-  // NoBringToFrontOnFocus window at the back of the stack, so the window
-  // created last ends up lowest. In the planned order the opaque taskbar
-  // covered the clock and swallowed PWR clicks.
+  // Draw the wallpaper, system controls, taskbar, and app windows in this order. Draw system controls before the taskbar so the taskbar does not cover the clock or PWR button.
   desktop::Render(state_);
   system_controls::Render(state_);
   taskbar::Render(state_);
@@ -148,8 +139,7 @@ void Application::RenderFrame() {
 }
 
 void Application::Shutdown() {
-  // Reverse order of Init(). Each step runs only if its init step succeeded,
-  // so this is safe after a partial init and safe to call twice.
+  // Release resources in the reverse order of setup. Check each setup flag. This is safe after a failure and after more than one call.
   if (opengl_backend_ready_) {
     ImGui_ImplOpenGL3_Shutdown();
     opengl_backend_ready_ = false;

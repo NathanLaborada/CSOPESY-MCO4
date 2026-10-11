@@ -1,4 +1,4 @@
-// Task Manager: simulated process list in an ImGui table (Byron, C1/C2).
+// Draw sample processes in an ImGui table.
 
 #include "apps/task_manager.h"
 
@@ -14,17 +14,17 @@ namespace desktop_os {
 namespace task_manager {
 namespace {
 
-// Window title must stay fixed so ImGui never creates a duplicate window.
+// Keep one window title to prevent duplicate windows.
 constexpr const char* kWindowTitle = "Task Manager";
 
-// Layout constants (Google style: k + PascalCase).
+// Layout constants use the project naming style.
 constexpr float kRowHeight = 24.0f;
 constexpr float kRowTextPadY = 4.0f;  // same pad File Explorer uses
 constexpr float kStatusColumnWidth = 92.0f;
 constexpr float kCpuColumnWidth = 72.0f;
 constexpr float kMemColumnWidth = 110.0f;
 
-// Placeholder window placement, used until the user moves/resizes it.
+// These values set the window's first position and size.
 constexpr float kDefaultPosX = 120.0f;
 constexpr float kDefaultPosY = 72.0f;
 constexpr float kDefaultWidth = 660.0f;
@@ -32,16 +32,12 @@ constexpr float kDefaultHeight = 440.0f;
 constexpr float kMinWidth = 460.0f;
 constexpr float kMinHeight = 280.0f;
 
-// CPU wobble: a small deterministic sine around each process's base value,
-// phased by row index so the rows do not move in lockstep. Amplitude is
-// deliberately tiny — this is demo data, not a measurement.
+// Vary each CPU value slightly by time and row. These values are sample data.
 constexpr float kCpuWobbleAmplitude = 1.0f;
 constexpr float kCpuWobbleSpeed = 0.9f;
 constexpr float kCpuPhaseStep = 1.3f;
 
-// One simulated process. `cpu_base` is the steady-state CPU percentage and
-// `mem_mb` the steady-state memory in megabytes; edit these to change the
-// demo data. Everything here is placeholder data, never a real reading.
+// Each Process has a name, status, CPU value, and memory value. Edit the array to change the sample data.
 struct Process {
   const char* name;
   const char* status;  // "Running" or "Suspended".
@@ -49,7 +45,7 @@ struct Process {
   float mem_mb;
 };
 
-// The dummy process table. Easy to edit: add, remove or revalue rows here.
+// Add or edit sample processes in this table.
 const Process kProcesses[] = {
     {"System", "Running", 0.8f, 48.0f},
     {"Desktop Window Manager", "Running", 2.4f, 96.5f},
@@ -67,8 +63,7 @@ const Process kProcesses[] = {
 constexpr int kProcessCount =
     static_cast<int>(sizeof(kProcesses) / sizeof(kProcesses[0]));
 
-// Current CPU % for one row: base plus the shared sine wobble, clamped to
-// sensible bounds. Suspended processes idle at exactly 0.
+// Calculate each CPU value from its base value and a small sine wave. Suspended processes use 0%.
 bool IsSuspended(const Process& process) {
   return std::strcmp(process.status, "Suspended") == 0;
 }
@@ -85,7 +80,7 @@ float ProcessCpu(const Process& process, int index) {
   return cpu;
 }
 
-// Aggregate row above the table: process count, summed CPU and memory.
+// Show the process count and total CPU and memory above the table.
 void DrawSummary() {
   float total_cpu = 0.0f;
   float total_mem = 0.0f;
@@ -101,9 +96,7 @@ void DrawSummary() {
   widgets::MutedText("Simulated dummy data, not actual system usage.");
 }
 
-// One table row: name, status, CPU % and memory for one dummy process.
-// v1.91.9b has no per-column text alignment, so numeric cells align
-// themselves to the right edge of their fixed-width column.
+// Draw one process row. Align numbers to the right in fixed-width columns.
 void DrawValueCell(float value) {
   char label[32];
   std::snprintf(label, sizeof(label), "%.1f", value);
@@ -140,7 +133,7 @@ void DrawProcessRow(const Process& process, int index) {
   DrawValueCell(process.mem_mb);
 }
 
-// The Processes section: a 4-column table over the dummy process array.
+// Draw the Processes table with four columns.
 void DrawProcessTable() {
   widgets::MutedText("Processes");
   const float table_height = ImGui::GetContentRegionAvail().y;
@@ -167,8 +160,7 @@ void DrawProcessTable() {
   }
 }
 
-// Snap the window so its bottom edge never enters the taskbar strip
-// (same approach as the other app windows; public API only).
+// Keep the window above the taskbar.
 void ClampAboveTaskbar() {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
   const float limit_y = viewport->Pos.y + viewport->Size.y - kTaskbarHeight;

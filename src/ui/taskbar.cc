@@ -8,8 +8,7 @@ namespace desktop_os {
 namespace taskbar {
 namespace {
 
-// Layout inside the 48 px bar: 32 px buttons starting at the left edge,
-// with a small open-indicator bar centered underneath each button.
+// Use 32 px buttons in the 48 px taskbar. Show an indicator below each open app.
 constexpr float kLeftPadding = 10.0f;
 constexpr float kTopPadding = 6.0f;
 constexpr float kButtonSize = 32.0f;
@@ -20,10 +19,10 @@ constexpr float kIndicatorGap = 4.0f;
 constexpr float kIndicatorRadius = 1.5f;
 constexpr float kTooltipGap = 4.0f;
 
-// Single restrained blue accent, matching theme::Apply() (#4A7BE0).
+// Use the same blue accent as the theme.
 constexpr ImU32 kIndicatorColor = IM_COL32(74, 123, 224, 255);
 
-// Semi-opaque dark bar (PROJECT_PLAN.md section 7).
+// Use a semi-transparent dark background for the bar.
 const ImVec4 kBarBackground(0.06f, 0.07f, 0.12f, 0.92f);
 
 struct LaunchButton {
@@ -33,7 +32,7 @@ struct LaunchButton {
   bool AppState::* show;
 };
 
-// Left-to-right order; all buttons sit left of the system_controls strip.
+// Place all app buttons before the system controls.
 constexpr LaunchButton kLaunchButtons[] = {
     {"file_explorer", "File Explorer", widgets::IconKind::kFolder,
      &AppState::show_file_explorer},
@@ -59,10 +58,7 @@ void Render(AppState& state) {
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
   ImGui::PushStyleColor(ImGuiCol_WindowBg, kBarBackground);
 
-  // Not movable/resizable, never takes focus, never jumps in front of the
-  // system_controls overlay. Application renders that overlay *before* this
-  // bar on purpose: ImGui puts a new NoBringToFrontOnFocus window at the
-  // back, so the window created last is drawn lowest.
+  // Keep the bar fixed and behind the system controls. Render system controls before the taskbar so the taskbar does not cover them.
   constexpr ImGuiWindowFlags kFlags =
       ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
       ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings |
@@ -72,7 +68,7 @@ void Render(AppState& state) {
 
   ImGui::Begin("Taskbar", nullptr, kFlags);
 
-  // Launch buttons must stay clear of the clock/PWR strip on the right.
+  // Keep app buttons clear of the clock and PWR area.
   const float limit_x = bar_size.x - system_controls::kSystemControlsWidth;
   float x = kLeftPadding;
   for (const LaunchButton& button : kLaunchButtons) {
@@ -85,13 +81,13 @@ void Render(AppState& state) {
       state.*(button.show) = true;  // Clicking opens; it never toggles closed.
     }
     if (ImGui::IsItemHovered()) {
-      // Above the bar, so it never covers the open indicators.
+      // Show tooltips above the taskbar.
       ImGui::SetNextWindowPos(ImVec2(button_pos.x, bar_pos.y - kTooltipGap),
                               ImGuiCond_Always, ImVec2(0.0f, 1.0f));
       ImGui::SetTooltip("%s", button.label);
     }
     if (open) {
-      // Open indicator centered under the button (requirements B1-B3).
+      // Show an indicator below each open app button.
       const float indicator_x =
           button_pos.x + (kButtonSize - kIndicatorWidth) * 0.5f;
       const float indicator_y = button_pos.y + kButtonSize + kIndicatorGap;

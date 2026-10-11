@@ -6,7 +6,7 @@ namespace desktop_os {
 namespace theme {
 namespace {
 
-// Single restrained blue accent used across both themes.
+// Use one blue accent in both themes.
 ImVec4 AccentBlue() { return ImVec4(0.29f, 0.48f, 0.88f, 1.00f); }
 
 void ApplySpacing(ImGuiStyle& style) {

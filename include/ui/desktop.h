@@ -1,4 +1,4 @@
-// Desktop background layer: the wallpaper drawn behind every window.
+// Desktop wallpaper drawn behind all windows.
 
 #ifndef DESKTOP_OS_UI_DESKTOP_H_
 #define DESKTOP_OS_UI_DESKTOP_H_
@@ -10,12 +10,11 @@ namespace desktop {
 
 inline constexpr int kWallpaperCount = 3;
 
-// Display names indexed by AppState::wallpaper_index, for the Settings picker.
+// Names for the wallpapers shown in Settings.
 inline constexpr const char* kWallpaperNames[kWallpaperCount] = {
     "Midnight", "Aurora", "Slate"};
 
-// Draws the wallpaper selected by `state.wallpaper_index` behind every
-// window. Call once per frame, before any other module.
+// Draw the selected wallpaper. Call this before the other UI modules.
 void Render(const AppState& state);
 
 }  // namespace desktop

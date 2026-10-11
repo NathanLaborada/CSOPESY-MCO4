@@ -1,4 +1,4 @@
-// Settings window: category list, simulated system info, pickers.
+// Settings window with categories and sample system information.
 
 #ifndef DESKTOP_OS_APPS_SETTINGS_H_
 #define DESKTOP_OS_APPS_SETTINGS_H_
@@ -8,11 +8,7 @@
 namespace desktop_os {
 namespace settings {
 
-// Draws the Settings window while state.show_settings is true. Categories:
-// System, Display, Personalization, About. All information is simulated
-// placeholder data. The wallpaper picker writes state.wallpaper_index; the
-// theme picker writes state.theme_index (Application re-applies the theme
-// when it changes). The window clamps above the taskbar.
+// Draw Settings when state.show_settings is true. All information is sample data. The wallpaper and theme choices update AppState. The window stays above the taskbar.
 void Render(AppState& state);
 
 }  // namespace settings

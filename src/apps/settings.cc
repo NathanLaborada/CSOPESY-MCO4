@@ -11,15 +11,15 @@ namespace desktop_os {
 namespace settings {
 namespace {
 
-// Window title must stay fixed so ImGui never creates a duplicate window.
+// Keep one window title to prevent duplicate windows.
 constexpr const char* kWindowTitle = "Settings";
 
-// Layout constants (Google style: k + PascalCase).
+// Layout constants use the project naming style.
 constexpr float kCategoryWidth = 180.0f;
 constexpr float kCategoryHeight = 26.0f;
 constexpr float kContentIndent = 4.0f;
 
-// Placeholder window placement, used until the user moves/resizes it.
+// These values set the window's first position and size.
 constexpr float kDefaultPosX = 96.0f;
 constexpr float kDefaultPosY = 68.0f;
 constexpr float kDefaultWidth = 720.0f;
@@ -31,10 +31,10 @@ constexpr const char* kCategories[] = {"System", "Display", "Personalization",
                                        "About"};
 constexpr int kCategoryCount = 4;
 
-// Module-private UI state: which category is shown.
+// Store the selected category.
 int g_category = 0;
 
-// A muted "label: value" line of simulated system information.
+// Show a system information row with a label and value.
 void InfoRow(const char* label, const char* value) {
   ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.62f, 0.65f, 0.72f, 1.00f));
   ImGui::Text("%s:", label);
@@ -43,7 +43,7 @@ void InfoRow(const char* label, const char* value) {
   ImGui::TextUnformatted(value);
 }
 
-// Clearly-marked placeholder content; nothing here queries the OS.
+// This content is sample data. It does not read the real system.
 void DrawSystemCategory() {
   widgets::MutedText("All values below are simulated dummy data.");
   ImGui::Spacing();
@@ -58,7 +58,7 @@ void DrawSystemCategory() {
 void DrawDisplayCategory() {
   widgets::MutedText("Placeholder display controls (simulated).");
   ImGui::Spacing();
-  // Disabled placeholders: locals are fine because nothing persists.
+  // These controls are disabled examples. Their values are not saved.
   int resolution = 0;
   float scale = 1.0f;
   ImGui::BeginDisabled(true);
@@ -70,9 +70,7 @@ void DrawDisplayCategory() {
   ImGui::TextUnformatted("notes on high-DPI for details.");
 }
 
-// Wallpaper and theme pickers write straight into the shared AppState.
-// The wallpaper change is visible immediately (desktop reads it every
-// frame); the theme change becomes visible once theme::Apply is wired.
+// The wallpaper and theme controls update AppState. The desktop reads the wallpaper choice each frame. Application applies theme changes.
 void DrawPersonalizationCategory(AppState& state) {
   if (state.wallpaper_index < 0 ||
       state.wallpaper_index >= desktop::kWallpaperCount) {
@@ -124,7 +122,7 @@ void DrawContent(AppState& state) {
   }
 }
 
-// Left category list (System, Display, Personalization, About).
+// Draw the category list.
 void DrawCategoryList() {
   ImGui::BeginChild("##categories", ImVec2(kCategoryWidth, 0.0f), true);
   for (int i = 0; i < kCategoryCount; ++i) {
@@ -137,8 +135,7 @@ void DrawCategoryList() {
   ImGui::EndChild();
 }
 
-// Snap the window so its bottom edge never enters the taskbar strip
-// (same approach as File Explorer; public API only, user moves stick).
+// Keep the window above the taskbar.
 void ClampAboveTaskbar() {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
   const float limit_y = viewport->Pos.y + viewport->Size.y - kTaskbarHeight;

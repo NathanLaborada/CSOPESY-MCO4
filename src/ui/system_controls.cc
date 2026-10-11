@@ -18,6 +18,7 @@ constexpr float kRightMargin = 8.0f;
 constexpr float kGap = 10.0f;
 constexpr float kNarrowWidth = 600.0f;
 
+// Format the local time and date as text.
 void CurrentTimeStrings(char* time_out, std::size_t time_size, char* date_out,
                         std::size_t date_size) {
   const std::time_t now_seconds =
@@ -34,6 +35,7 @@ void CurrentTimeStrings(char* time_out, std::size_t time_size, char* date_out,
 
 }  // namespace
 
+// Draw the clock and PWR button in the taskbar area.
 void Render(AppState& state) {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
   float width = kSystemControlsWidth;
