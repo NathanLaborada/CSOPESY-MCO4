@@ -27,16 +27,18 @@ const ImVec4 kBarBackground(0.06f, 0.07f, 0.12f, 0.92f);
 
 struct LaunchButton {
   const char* id;
+  const char* label;  // Hover tooltip.
   widgets::IconKind kind;
   bool AppState::* show;
 };
 
 // Left-to-right order; all buttons sit left of the system_controls strip.
 constexpr LaunchButton kLaunchButtons[] = {
-    {"file_explorer", widgets::IconKind::kFolder,
+    {"file_explorer", "File Explorer", widgets::IconKind::kFolder,
      &AppState::show_file_explorer},
-    {"settings", widgets::IconKind::kSettings, &AppState::show_settings},
-    {"task_manager", widgets::IconKind::kTaskManager,
+    {"settings", "Settings", widgets::IconKind::kSettings,
+     &AppState::show_settings},
+    {"task_manager", "Task Manager", widgets::IconKind::kTaskManager,
      &AppState::show_task_manager},
 };
 
@@ -57,7 +59,9 @@ void Render(AppState& state) {
   ImGui::PushStyleColor(ImGuiCol_WindowBg, kBarBackground);
 
   // Not movable/resizable, never takes focus, never jumps in front of the
-  // system_controls overlay that renders right after this module.
+  // system_controls overlay. Application renders that overlay *before* this
+  // bar on purpose: ImGui puts a new NoBringToFrontOnFocus window at the
+  // back, so the window created last is drawn lowest.
   constexpr ImGuiWindowFlags kFlags =
       ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
       ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings |
@@ -79,6 +83,7 @@ void Render(AppState& state) {
                             ImVec2(kButtonSize, kButtonSize), open)) {
       state.*(button.show) = true;  // Clicking opens; it never toggles closed.
     }
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", button.label);
     if (open) {
       // Open indicator centered under the button (requirements B1-B3).
       const float indicator_x =
