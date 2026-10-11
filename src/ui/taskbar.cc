@@ -18,6 +18,7 @@ constexpr float kIndicatorWidth = 18.0f;
 constexpr float kIndicatorHeight = 3.0f;
 constexpr float kIndicatorGap = 4.0f;
 constexpr float kIndicatorRadius = 1.5f;
+constexpr float kTooltipGap = 4.0f;
 
 // Single restrained blue accent, matching theme::Apply() (#4A7BE0).
 constexpr ImU32 kIndicatorColor = IM_COL32(74, 123, 224, 255);
@@ -83,7 +84,12 @@ void Render(AppState& state) {
                             ImVec2(kButtonSize, kButtonSize), open)) {
       state.*(button.show) = true;  // Clicking opens; it never toggles closed.
     }
-    if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", button.label);
+    if (ImGui::IsItemHovered()) {
+      // Above the bar, so it never covers the open indicators.
+      ImGui::SetNextWindowPos(ImVec2(button_pos.x, bar_pos.y - kTooltipGap),
+                              ImGuiCond_Always, ImVec2(0.0f, 1.0f));
+      ImGui::SetTooltip("%s", button.label);
+    }
     if (open) {
       // Open indicator centered under the button (requirements B1-B3).
       const float indicator_x =
