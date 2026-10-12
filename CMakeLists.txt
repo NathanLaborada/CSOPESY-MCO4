@@ -7,7 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(FetchContent)
 
-# --- Dependencies (pinned so all four members build the same code) ---------
+# Use fixed versions so all group members build the same dependencies.
 set(GLFW_BUILD_DOCS     OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS    OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
@@ -27,7 +27,7 @@ FetchContent_MakeAvailable(glfw imgui)
 
 find_package(OpenGL REQUIRED)
 
-# Dear ImGui ships no CMake target: compile core + the two backends exactly once.
+# Build Dear ImGui and its GLFW and OpenGL backends as one library.
 add_library(imgui STATIC
     ${imgui_SOURCE_DIR}/imgui.cpp
     ${imgui_SOURCE_DIR}/imgui_draw.cpp
@@ -39,10 +39,8 @@ add_library(imgui STATIC
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
 target_link_libraries(imgui PUBLIC glfw OpenGL::GL)
 
-# --- Application -----------------------------------------------------------
-# Every .cc under src/ is picked up automatically, so members add their module
-# files without editing this file (re-run CMake configure after adding a file).
-# Naming follows the Google C++ Style Guide: lower_snake_case.cc / .h.
+# Add all .cc files under src/. Re-run CMake when you add a source file.
+# Use lower_snake_case for source and header file names.
 file(GLOB_RECURSE DESKTOPOS_SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cc)
 
 add_executable(DesktopOS ${DESKTOPOS_SOURCES})
@@ -51,8 +49,7 @@ target_link_libraries(DesktopOS PRIVATE imgui)
 
 if(MSVC)
     target_compile_options(DesktopOS PRIVATE /W4 /utf-8)
-    # Release runs without a console window; Debug keeps it so [init]/[GLFW]
-    # error messages are visible.
+    # Show error messages in Debug. Hide the console in Release.
     set_target_properties(DesktopOS PROPERTIES WIN32_EXECUTABLE $<CONFIG:Release>)
     target_link_options(DesktopOS PRIVATE $<$<CONFIG:Release>:/ENTRY:mainCRTStartup>)
     set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT DesktopOS)
