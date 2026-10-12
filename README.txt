@@ -1,81 +1,75 @@
-CSOPESY MCO4 - DESKTOP-STYLE OS MOCK-UP
+CSOPESY MCO4 - Desktop-Style OS Mock-Up
 ========================================
 
-GROUP MEMBERS
--------------
-Ang, Byron Scott
-Laborada, Nathan
-Sotingco, Kimbery Wynelle
-Tee, John Lorens
+Members
+-------
+  Ang, Byron Scott
+  Laborada, Nathan
+  Sotingco, Kimbery Wynelle
+  Tee, John Lorens
 
-PROGRAM PURPOSE
----------------
-This program shows a simulated desktop environment. It includes a desktop,
-a taskbar, File Explorer, Settings, and Task Manager.
+Entry file
+----------
+  src/main.cc
+      Contains function main().
+      It creates the Application object, starts the application, and runs
+      the main loop.
 
-The program does not read real files, change system settings, or read real
-process data. These screens use sample data.
+Build requirements
+------------------
+  Windows 10 or Windows 11, 64-bit
+  Visual Studio Community 2026 with the "Desktop development with C++" workload
+  CMake 3.24 or later
+  Ninja and Git
+  Internet access for the first setup
+  A graphics driver that supports OpenGL 3.3
 
-PROGRAM ENTRY
--------------
-File: src/main.cc
-Function: main()
+Build
+-----
+  In Visual Studio:
+  1. Select File > Open > Folder.
+  2. Select the folder that contains CMakeLists.txt.
+  3. Wait for CMake to finish the first setup. CMake downloads GLFW and
+     Dear ImGui during this step.
+  4. Select x64 Debug or x64 Release.
+  5. Select Build > Build All.
 
-The main() function creates the Application object. It calls Init() to start
-the program and Run() to show the desktop.
+  Or use Developer PowerShell for Visual Studio 2026. Change to the project
+  folder and run:
 
-REQUIREMENTS
+      cmake --preset x64-debug
+      cmake --build --preset x64-debug
+
+  Use x64-release instead of x64-debug for a Release build.
+
+Run
+---
+  In Visual Studio, select DesktopOS.exe as the startup item and press F5.
+
+  Or run this file from Developer PowerShell:
+
+      .\out\build\x64-debug\DesktopOS.exe
+
+  To close the program, click the PWR button on the taskbar. You can also
+  close the window with its X button.
+
+Dependencies
 ------------
-- Windows 10 or Windows 11, 64-bit
-- Visual Studio Community 2026 with the "Desktop development with C++" workload
-- CMake and Ninja
-- Git
-- Internet access for the first build
-- A graphics driver that supports OpenGL 3.3
+  CMake downloads these libraries during the first setup:
+  GLFW 3.4
+  Dear ImGui v1.91.9b
 
-BUILD AND RUN IN VISUAL STUDIO
-------------------------------
-1. Open Visual Studio.
-2. Select File > Open > Folder.
-3. Select the project folder. It contains CMakeLists.txt.
-4. Wait for CMake to finish. The first setup downloads GLFW and Dear ImGui.
-5. Select Windows x64 Debug or Windows x64 Release.
-6. Select Build > Build All.
-7. Select DesktopOS.exe as the startup item.
-8. Press F5 to start the program.
+  Windows provides OpenGL.
 
-To close the program, click the PWR button on the taskbar. You can also
-close the window with its X button.
-
-BUILD FROM A COMMAND LINE
--------------------------
-Open Developer PowerShell for Visual Studio 2026. Change to the project
-folder and run these commands:
-
-    cmake --preset x64-debug
-    cmake --build --preset x64-debug
-    .\out\build\x64-debug\DesktopOS.exe
-
-Use x64-release instead of x64-debug for a Release build. Use Developer
-PowerShell so that the Visual Studio compiler is available.
-
-DEPENDENCIES
-------------
-CMake downloads these libraries during the first setup:
-- GLFW 3.4
-- Dear ImGui v1.91.9b
-
-Windows provides OpenGL.
-
-FEATURES
+Features
 --------
-- Desktop wallpaper with three styles
-- Live clock and date
-- PWR button to close the program
-- Taskbar buttons for File Explorer, Settings, and Task Manager
-- Sample file and folder list
-- Sample system and display settings
-- Wallpaper and color theme choices
-- Process table with sample CPU and memory values
+  Desktop wallpaper with three styles
+  Live clock and date
+  PWR button to close the program
+  Taskbar buttons for File Explorer, Settings, and Task Manager
+  Sample file and folder list
+  Sample system and display settings
+  Wallpaper and color theme choices
+  Process table with sample CPU and memory values
 
-All system and process data in this program is sample data.
+The program uses sample data for system and process information.
