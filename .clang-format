@@ -1,6 +1,5 @@
-# Google C++ Style Guide formatting. Visual Studio applies this file
-# automatically (Edit > Advanced > Format Document, or Ctrl+K, Ctrl+D).
+# Apply the Google C++ style.
+# In Visual Studio, use Edit > Advanced > Format Document to format a file.
 BasedOnStyle: Google
-# Keep the guide's include groups (related, C, C++, libraries, project)
-# exactly as written instead of merging the quoted ones.
+# Keep the include groups in their current order.
 IncludeBlocks: Preserve
