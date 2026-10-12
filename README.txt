@@ -31,7 +31,7 @@ Build
   2. Select the folder that contains CMakeLists.txt.
   3. Wait for CMake to finish the first setup. CMake downloads GLFW and
      Dear ImGui during this step.
-  4. Select x64 Debug or x64 Release.
+  4. Select Windows x64 Debug or Windows x64 Release.
   5. Select Build > Build All.
 
   Or use Developer PowerShell for Visual Studio 2026. Change to the project
